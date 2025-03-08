@@ -14,15 +14,14 @@ class Color {
 
   fromRGB(color: string): string {
     const rgb = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
-    if (rgb === null) {
-      throw new Error('Invalid RGB color string');
-    }
+    let r: number,
+        g: number,
+        b: number;
+    r = parseInt(rgb[1]);
+    g = parseInt(rgb[2]);
+    b = parseInt(rgb[3]);
 
-    return Color.fromRGBHelper(
-      parseInt(rgb[1]),
-      parseInt(rgb[2]),
-      parseInt(rgb[3])
-    );
+    return Color.fromRGBHelper(r, g, b);
   }
 
   /**
@@ -33,10 +32,6 @@ class Color {
    */
   fromHSL(color: string): string {
     const hsl = color.match(/^hsl\((\d+),\s*(\d+)%,\s*(\d+)%/);
-    if (hsl === null) {
-      throw new Error('Invalid HSL color string');
-    }
-
     const h = parseInt(hsl[1]);
     const s = parseInt(hsl[2]) / 100;
     const l = parseInt(hsl[3]) / 100;
@@ -49,9 +44,9 @@ class Color {
     // match lightness
     const m = l - c / 2;
 
-    let r: number = 0,
-        g: number = 0,
-        b: number = 0;
+    let r: number,
+        g: number,
+        b: number;
     if (hPrime <= 1) {
       r = c;
       g = x;

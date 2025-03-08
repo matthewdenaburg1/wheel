@@ -4,10 +4,10 @@
     "description": "Replacement for <https://wheelofnames.com>.",
     "main": "index.ts",
     "scripts": {
-        "start": "vite",
-        "preview": "vite build && vite preview",
-        "build": "NODE_ENV=main vite build",
-        "build:staging": "NODE_ENV=staging vite build"
+        "start": "concurrently npm:build:css vite npm:build:tsw",
+        "build:css": "sass --watch --no-source-map src/scss/main.scss docs/css/main.css",
+        "build:tsw": "tsc --watch",
+        "build:ts": "tsc"
     },
     "repository": {
         "url": "git@github.com:matthewdenaburgvc/wheel.git",
@@ -35,11 +35,11 @@
     "devDependencies": {
         "@types/canvas-confetti": "^1.9.0",
         "@types/jquery": "^3.5.32",
-        "@types/node": "^22.13.10",
-        "@types/node-sass": "^4.11.8",
-        "sass-embedded": "^1.85.1",
+        "concurrently": "^9.1.0",
+        "prettier": "^3.3.3",
+        "sass": "^1.81.0",
         "typescript": "^5.8.2",
-        "vite": "^5.4.14",
+        "vite": "^5.4.11",
         "vite-plugin-sass": "^0.1.0"
     },
     "dependencies": {
