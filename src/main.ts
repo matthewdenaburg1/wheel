@@ -1,10 +1,9 @@
 import $ from "jquery";
 import "./scss/main.scss";
-import Wheel from "./ts/wheel";
-import { loadNamesFromUrl, shareUrl, saveNames, updateNames, darkModeToggler } from "./ts/utils.ts";
+import { loadNamesFromUrl, shareUrl, saveNames, darkModeToggler, addName } from "./ts/utils.ts";
 
 $(document).ready(function() {
-  const names = loadNamesFromUrl().randomize();
+  const names = loadNamesFromUrl();
   if (names.length === 0) {
     for (let i = 1; i <= 6; i++) {
       names.push(`Person ${i}`);
@@ -13,10 +12,7 @@ $(document).ready(function() {
 
   $("#share").on("click", shareUrl);
   $('#theme-toggle').on("click", darkModeToggler());
-  $('#go-button').on("click", saveNames);
-  $('#edit-button').on("click", updateNames);
+  $('#add-button').on('click', addName);
 
-  $(`#people-input`).val(names.join('\n'));
-
-  new Wheel(names).init();
+  saveNames(names);
 });

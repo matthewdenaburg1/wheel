@@ -96,11 +96,30 @@ function shareUrl(): void {
     });
 }
 
-function saveNames(): void {
-  var $list = $('#people ul').empty();
+function updateWheel(): void {
+  const checkedNames = $('input[type="checkbox"]:checked').map(function() {
+    return $(this).val() as string;
+  }).get();
 
-  const inputNames = $('#people-input').val()!.toString().split('\n').filter(Boolean);
-  inputNames.forEach((name, index) => {
+  if (Wheel.self) {
+    Wheel.self.names = checkedNames.randomize();
+    Wheel.self.init();
+  } else {
+    new Wheel(checkedNames.randomize()).init();
+  }
+}
+
+function removeName(name: string): void {
+  $(`input[type="checkbox"][value="${name}"]`).parent().remove();
+  updateWheel();
+}
+
+function addName(): void {
+  const name = prompt("Enter a new name:");
+  if (name) {
+    const $list = $('#people ul');
+    const index = $list.find('li').length;
+
     var $li = $('<li>');
     var $checkbox = $('<input>', {
       id: 'name_' + index,
@@ -113,21 +132,43 @@ function saveNames(): void {
       for: 'name_' + index,
       text: name
     });
+    var $deleteButton = $('<button class="delete-button">-</button>');
+    $deleteButton.on('click', () => removeName(name));
 
-    $li.append($checkbox).append($label);
+    $li.append($checkbox).append($label).append($deleteButton);
+    $list.append($li);
+
+    $('input[type="checkbox"]').off('change').on('change', updateWheel);
+    updateWheel();
+  }
+}
+
+function saveNames(names: string[]): void {
+  var $list = $('#people ul').empty();
+
+  names.forEach((name, index) => {
+    var $li = $('<li>');
+    var $checkbox = $('<input>', {
+      id: 'name_' + index,
+      name: name,
+      value: name,
+      type: 'checkbox',
+      checked: true,
+    });
+    var $label = $('<label>', {
+      for: 'name_' + index,
+      text: name
+    });
+    var $deleteButton = $('<button class="delete-button">-</button>');
+    $deleteButton.on('click', () => removeName(name));
+
+    $li.append($checkbox).append($label).append($deleteButton);
     $list.append($li);
   });
 
-  $('#configure-people').hide();
+  $('input[type="checkbox"]').on('change', updateWheel);
   $('#people').show();
-
-  Wheel.self.names = inputNames.randomize();
-  Wheel.self.init();
+  updateWheel();
 }
 
-function updateNames(): void {
-  $("#configure-people").show();
-  $("#people").hide();
-}
-
-export { loadNamesFromUrl, shareUrl, saveNames, updateNames, darkModeToggler };
+export { loadNamesFromUrl, shareUrl, saveNames, darkModeToggler, addName };
