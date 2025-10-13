@@ -81,14 +81,9 @@ body {
     color: var(--strong-color);
     font-weight: bold;
   }
-  textarea {
-    resize: vertical;
 
-    background-color: var(--textarea-background-color);
-    color: var(--code-text-color);
-  }
 
-  > .header {
+  .header {
     width: 100%;
     text-align: center;
 
@@ -97,33 +92,20 @@ body {
 
   #content {
     margin: 0;
-    padding: 5vh 10vw;
+    margin-top: 5vh;
 
     position: relative;
-    display: block;
-    width: 25%; // TODO re-enable
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-evenly;
     height: 100%;
 
-    .content {
-      height: 100%;
-
-      #configure-people {
-        height: 60%;
-
-        textarea {
-          height: 100%;
-          width: 100%;
-        }
-      }
-
-      #people div ul {
-        margin: 0 0 2vh;
-      }
-    }
-
-    section.right {
+    section.right,
+    .wheel {
       padding-left: 2vw;
-      width: 75%;
+      width: 500px;
+      height: 500px;
 
       #wheel-container {
         position: relative;
@@ -174,6 +156,90 @@ body {
               border: 1px solid var(--border-color);
             }
           }
+        }
+      }
+    }
+  }
+
+  .controls {
+    .list {
+      color: var(--icon-color);
+
+      list-style-type: none;
+      line-height: 2rem;
+
+      .row {
+        display: flex;
+
+        .item {
+          margin-right: 0.25rem;
+        }
+      }
+
+      &.menu .row {
+        font-size: 1.5rem;
+
+        .icon {
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+      }
+
+      &.people {
+        width: 15rem;
+        max-width: 15rem;
+
+        .row {
+          border-bottom: 1px solid var(--border-color);
+
+          .item {
+            &:has(input.name-input) {
+              border-bottom: none;
+            }
+            &:last-child {
+              flex-grow: 1;
+              // min-width: 10rcap;
+              width: 10px;
+            }
+          }
+        }
+
+        input.name-input {
+          padding: 0.25rem;
+          margin-top: 0.5rem;
+          font-size: 1rem;
+          width: 100%;
+
+          border-bottom: 1px solid var(--border-color);
+
+          background-color: transparent;
+          color: var(--text-color);
+
+          &::placeholder {
+            color: var(--code-text-color);
+          }
+          &:focus {
+            outline: none;
+            border-bottom: 2px solid var(--border-color);
+          }
+        }
+      }
+    }
+
+    .row {
+      .hover:hover {
+        cursor: pointer;
+        filter: var(--icon-shift);
+      }
+
+      &.disabled {
+        .name .icon {
+          text-decoration: line-through 0.1rem;
+          font-style: italic;
+        }
+
+        :not(.hover) {
+          cursor: default;
         }
       }
     }
@@ -242,84 +308,26 @@ body {
     }
   }
 
-  .list {
-    color: var(--icon-color);
-
-    list-style-type: none;
-    line-height: 2rem;
-
-    .row {
-      display: flex;
-      .item {
-        margin-right: 0.25rem;
-        &:last-child {
-          flex-grow: 1;
-        }
-      }
-    }
-
-    &.menu .row {
-      font-size: 1.5rem;
-      .icon {
-        width: 1.5rem;
-        height: 1.5rem;
-      }
-    }
-
-    &.people {
-      .row {
-        border-bottom: 1px solid var(--border-color);
-
-        &:has(input.name-input) {
-          border-bottom: none;
-        }
-      }
-
-      input.name-input {
-        padding: 0.25rem;
-        margin-top: 0.5rem;
-        font-size: 1rem;
-        width: 100%;
-
-        border-bottom: 1px solid var(--border-color);
-
-        background-color: transparent;
-        color: var(--text-color);
-
-        &::placeholder {
-          color: var(--code-text-color);
-        }
-        &:focus {
-          outline: none;
-          border-bottom: 2px solid var(--border-color);
-        }
-      }
-    }
-  }
-
-  .row {
-    .hover:hover {
-      cursor: pointer;
-      filter: var(--icon-shift);
-    }
-
-    &.disabled {
-      .name .icon {
-        text-decoration: line-through 0.1rem;
-        font-style: italic;
-      }
-
-      :not(.hover) {
-        cursor: default;
-      }
-    }
-  }
-
   .hidden {
     display: none;
   }
 
   .visible {
     display: block;
+  }
+}
+
+@media (max-width: 800px) {
+  body {
+    #content {
+      flex-direction: column;
+      padding: 0 3vw;
+      margin-top: 5vh;
+    }
+
+    .controls {
+      width: 100%;
+      margin-bottom: 2rem;
+    }
   }
 }

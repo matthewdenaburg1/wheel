@@ -8,7 +8,7 @@ class Wheel {
   /** the slices on the wheel */
   private _sectors: Array<Sector> = [];
   private _radius: number = 100;
-  private _content: JQuery = $('<div>').attr('id', 'wheel');
+  private _content: JQuery<HTMLElement> = $('<div>').attr('id', 'wheel');
 
   names: Array<string> = [];
 
@@ -19,8 +19,6 @@ class Wheel {
     }
 
     this.names = names || [];
-    this._radius = 100;
-
     Wheel.self = this;
   }
 
