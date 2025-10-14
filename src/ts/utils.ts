@@ -1,4 +1,5 @@
 import $ from "jquery";
+import PersonList from "./person_list";
 
 declare global {
   interface Array<T> {
@@ -84,11 +85,8 @@ function loadNamesFromUrl(): Array<string> {
 }
 
 function shareUrl(): void {
-  const names = $('#people-input')
-    .val()!
-    .toString()
-    .split('\n')
-    .filter(Boolean)
+  const names = PersonList.instance.people
+    .map(person => person.name)
     .map(encodeURIComponent)
     .join('&name=');
 
@@ -103,7 +101,8 @@ function shareUrl(): void {
     },
     function() {
       alert("Failed to copy URL to clipboard.");
-    });
+    }
+  );
 }
 
 export { loadNamesFromUrl, shareUrl, darkModeToggler };

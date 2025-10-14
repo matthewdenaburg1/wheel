@@ -1,6 +1,5 @@
 import $ from "jquery";
 import Sector from './sector';
-// import Person from "./person";
 import confetti from 'canvas-confetti';
 
 class Wheel {
@@ -13,18 +12,13 @@ class Wheel {
   private _content: JQuery<HTMLElement> = $('<div>').attr('id', 'wheel');
 
   private _names: Array<string> = [];
-  // private _people: Array<Person> = [];
 
   /** Create a new Wheel */
   constructor(names: Array<string> = []) {
-
-  // constructor(people: Person[] = []) {
     if (Wheel.self) {
       return Wheel.self;
     }
 
-    // this._people = people;
-    // this._names = this._people.map(person => person.name);
     this._names = names;
     Wheel.self = this;
   }
@@ -49,7 +43,6 @@ class Wheel {
 
   /** Draw the wheel */
   draw(): this {
-    // this.resize();
     if (this._sectors.length === 0) {
       this.createSlices();
     }
@@ -68,10 +61,8 @@ class Wheel {
   private createSlices(): this {
     const sectorAngle = 360 / this._names.length;
 
-    // this._people.forEach((person: Person, index: number) => {
     this._names.forEach((name: string, index: number) => {
       const angle = index * sectorAngle;
-      // const sector = new Sector(Math.floor(angle), '', person);
       const sector = new Sector(Math.floor(angle), name);
       this._sectors.push(sector);
     });

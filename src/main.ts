@@ -1,23 +1,25 @@
 import $ from "jquery";
 import "./scss/main.scss";
 import Wheel from "./ts/wheel";
-import Person from "./ts/person";
+import Person from "./ts/person.ts";
+import PersonList from "./ts/person_list.ts";
 import { loadNamesFromUrl, shareUrl, darkModeToggler } from "./ts/utils.ts";
 
 $(document).ready(function() {
-  const people = Person.fromNames(loadNamesFromUrl()).randomize();
+  const personList = PersonList.fromNames(loadNamesFromUrl());
+
+  const people = personList.people;
   if (people.length === 0) {
     for (let i = 1; i <= 6; i++) {
       people.push(new Person(`Person ${i}`));
     }
   }
 
-  Person.renderAll();
+  personList.render();
 
-  $("#new-name").on("click", Person.newPerson);
+  $("#new-name").on("click", personList.add);
   $("#share").on("click", shareUrl);
   $("#theme-toggle").on("click", darkModeToggler());
 
-  // new Wheel(Person.getPeople()).init();
-  new Wheel(Person.getNames()).init();
+  new Wheel(personList.names).init();
 });
