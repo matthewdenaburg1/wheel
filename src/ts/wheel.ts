@@ -1,24 +1,31 @@
 import $ from "jquery";
 import Sector from './sector';
+// import Person from "./person";
 import confetti from 'canvas-confetti';
 
 class Wheel {
   static self: Wheel;
+  private static _startRadius = 500;
 
   /** the slices on the wheel */
   private _sectors: Array<Sector> = [];
-  private _radius: number = 100;
+  private _radius: number = Wheel._startRadius;
   private _content: JQuery<HTMLElement> = $('<div>').attr('id', 'wheel');
 
-  names: Array<string> = [];
+  private _names: Array<string> = [];
+  // private _people: Array<Person> = [];
 
   /** Create a new Wheel */
   constructor(names: Array<string> = []) {
+
+  // constructor(people: Person[] = []) {
     if (Wheel.self) {
       return Wheel.self;
     }
 
-    this.names = names || [];
+    // this._people = people;
+    // this._names = this._people.map(person => person.name);
+    this._names = names;
     Wheel.self = this;
   }
 
@@ -42,7 +49,7 @@ class Wheel {
 
   /** Draw the wheel */
   draw(): this {
-    this.resize();
+    // this.resize();
     if (this._sectors.length === 0) {
       this.createSlices();
     }
@@ -52,28 +59,19 @@ class Wheel {
     return this;
   }
 
-  /** Resize the wheel */
-  private resize(): this {
-    let parentWidth: number = this._content.parent().width() || 100;
-    let parentHeight: number = this._content.parent().height() || 100;
-
-    this._radius = Math.min(parentWidth, parentHeight);
-    this._radius = Math.round(this._radius);
-
-    this._content.css({
-      width: this._radius + 'px',
-      height: this._radius + 'px'
-    });
-
-    return this;
+  public set names(names: string[]) {
+    this._names = names;
+    this.init();
   }
 
   /** Create the slices */
   private createSlices(): this {
-    const sectorAngle = 360 / this.names.length;
+    const sectorAngle = 360 / this._names.length;
 
-    this.names.forEach((name: string, index: number) => {
+    // this._people.forEach((person: Person, index: number) => {
+    this._names.forEach((name: string, index: number) => {
       const angle = index * sectorAngle;
+      // const sector = new Sector(Math.floor(angle), '', person);
       const sector = new Sector(Math.floor(angle), name);
       this._sectors.push(sector);
     });

@@ -1,5 +1,4 @@
 import $ from "jquery";
-import Wheel from "./wheel";
 
 declare global {
   interface Array<T> {
@@ -96,38 +95,4 @@ function shareUrl(): void {
     });
 }
 
-function saveNames(): void {
-  var $list = $('#people ul').empty();
-
-  const inputNames = $('#people-input').val()!.toString().split('\n').filter(Boolean);
-  inputNames.forEach((name, index) => {
-    var $li = $('<li>');
-    var $checkbox = $('<input>', {
-      id: 'name_' + index,
-      name: name,
-      value: name,
-      type: 'checkbox',
-      checked: true,
-    });
-    var $label = $('<label>', {
-      for: 'name_' + index,
-      text: name
-    });
-
-    $li.append($checkbox).append($label);
-    $list.append($li);
-  });
-
-  $('#configure-people').hide();
-  $('#people').show();
-
-  Wheel.self.names = inputNames.randomize();
-  Wheel.self.init();
-}
-
-function updateNames(): void {
-  $("#configure-people").show();
-  $("#people").hide();
-}
-
-export { loadNamesFromUrl, shareUrl, saveNames, updateNames, darkModeToggler };
+export { loadNamesFromUrl, shareUrl, darkModeToggler };
