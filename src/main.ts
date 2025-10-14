@@ -2,23 +2,22 @@ import $ from "jquery";
 import "./scss/main.scss";
 import Wheel from "./ts/wheel";
 import Person from "./ts/person";
-import { loadNamesFromUrl, shareUrl, saveNames, updateNames, darkModeToggler } from "./ts/utils.ts";
+import { loadNamesFromUrl, shareUrl, darkModeToggler } from "./ts/utils.ts";
 
 $(document).ready(function() {
-  // const names = loadNamesFromUrl().randomize();
-  // if (names.length === 0) {
-  //   for (let i = 1; i <= 6; i++) {
-  //     names.push(`Person ${i}`);
-  //   }
-  // }
-  ['Matthew', 'Andrew'].forEach(name => new Person(name));
-  Person.renderAll();
-  let names = Person.getNames();
+  const people = Person.fromNames(loadNamesFromUrl()).randomize();
+  if (people.length === 0) {
+    for (let i = 1; i <= 6; i++) {
+      people.push(new Person(`Person ${i}`));
+    }
+  }
 
-  $("#new-name").on("click", Person.showNewPersonInput);
+  Person.renderAll();
+
+  $("#new-name").on("click", Person.newPerson);
   $("#share").on("click", shareUrl);
   $("#theme-toggle").on("click", darkModeToggler());
-  // $("#people-input").val(names.join('\n'));
 
-  new Wheel(names).init();
+  // new Wheel(Person.getPeople()).init();
+  new Wheel(Person.getNames()).init();
 });

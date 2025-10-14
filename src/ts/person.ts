@@ -1,8 +1,9 @@
 import $ from "jquery";
+import Wheel from "./wheel";
 
 class Person {
   private _enabled: boolean = true;
-  private _name: string;
+  private _name: string = '';
   private _id: number;
   private _cssId: string;
 
@@ -10,11 +11,13 @@ class Person {
   private static _people: Person[] = [];
 
   constructor(name: string) {
-    this._name = name;
+    if (name === null) {
+      throw new Error('Name cannot be null');
+    }
+
     this._id = Person._currentId++;
     this._cssId = `person-${this._id}`;
-
-    Person._people.push(this);
+    this.name = name;
   }
 
   public get name(): string {
@@ -31,86 +34,168 @@ class Person {
 
   public set name(name: string) {
     this._name = name;
+
+    // if there is a name, add to the list of people.
+    // This prevents blank names from being added to the wheel.
+    if (this.name.length > 0) {
+      Person._people.push(this);
+    }
   }
+
+  public set enabled(enabled: boolean) {
+    // return if not different
+    if (this.enabled === enabled) {
+      return;
+    }
+
+    // update
+    this._enabled = enabled;
+
+    const $element = $(`#${this._cssId}`);
+    // add `disabled` if the person is
+    $element.toggleClass('disabled', this.enabled === false);
+    // and if they ARE enabled, turn the hover functinoality on the buttons on
+    $element.find('.buttons .icon').toggleClass('hover', this.enabled === true);
+
+    Wheel.self.names = Person.getNames();
+  }
+
 
   public toString(): string {
     return this._name;
   }
 
-  public render(): JQuery<HTMLElement> {
-    const $row = $(`
-      <div class="row person" id="${this._cssId}">
-        <div class="item buttons">
-          <span class="icon hover remove fa fa-trash" title="Remove"></span>
-          <span class="icon hover edit fa fa-edit" title="Edit"></span>
-        </div>
-        <div class="item name hover">
-          <span class="icon">${this._name}</span>
-        </div>
-      </div>
-    `);
+  private getItemNameElement(): JQuery<HTMLElement> {
+    return $('<div>')
+      .addClass('item name hover')
+      .append($(`<span class="icon">${this._name}</span>`))
+      .on('click', () => { this.enabled = !this.enabled; });
+  }
 
-    $row.find('.name').on('click', () => this.toggleName());
-    $row.find('.remove').on('click', () => this.removeName());
+  public toHTML(): JQuery<HTMLElement> {
+    const $row = $("<div>").addClass('row person').attr('id', this._cssId);
+    const $buttons = $(`<div class="item buttons">
+      <span class="icon hover remove fa fa-trash" title="Remove"></span>
+      <span class="icon hover edit fa fa-edit" title="Edit"></span>
+    </div>`);
+
+    const $itemName = this.getItemNameElement();
+
+    $buttons.find('.edit').on('click', () => this.edit());
+    $buttons.find('.remove').on('click', () => this.remove());
+
+    $row.append($buttons).append($itemName);
 
     return $row;
   }
 
-  private toggleName(): void {
-    this._enabled = !this._enabled;
-    $(`#${this._cssId}`).toggleClass('disabled', !this._enabled);
-    $(`#${this._cssId} .buttons .icon`).toggleClass('hover', this._enabled);
+  private edit(): void {
+    if (this.enabled === false) {
+      return;
+    }
+
+    const onSave = (name: string, $input: JQuery<HTMLElement>) => {
+      this.name = name;
+      $input.replaceWith(this.getItemNameElement());
+    };
+    this.renderNameInputElement('edit', onSave);
   }
 
-  private removeName(): void {
+  private add(): void {
+    const onSave = (name: string, $input: JQuery<HTMLElement>) => {
+      this.name = name;
+      $input.replaceWith(this.toHTML());
+    }
+    const $input = this.renderNameInputElement('add', onSave);
+    $('#people-list').append($input);
+    $input.trigger('focus');
+  }
+
+  private remove(): void {
+    if (this.enabled === false) {
+      return;
+    }
+
     $(`#${this._cssId}`).remove();
   }
 
-  public static getNames(): string[] {
-    return Person._people.map(person => person.name);
-  }
+  private renderNameInputElement(type: string, onSave: (name: string, $input: JQuery<HTMLElement>) => void): JQuery<HTMLElement> {
+    if (['edit', 'add'].includes(type) === false) {
+      throw new Error('Invalid type for renderNameInputElement');
+    }
 
-  public static showNewPersonInput(): void {
-    const newId = Person._currentId++;
+    let cssClass: string = 'name-input',
+        placeholder: string = 'Name',
+        value: string = '';
+
+    if (type === 'edit') {
+      cssClass = 'name-edit';
+      value = this.name;
+    }
+
     const $input = $('<input />')
-      .addClass('name-input')
+      .addClass(cssClass)
       .attr({
         'type': 'text',
-        'id': `new-person-input-${newId}`,
-        'data-person-id': newId,
-        'placeholder': 'New name',
-      });
+        'id': `person-input-${this.id}`,
+        'data-person-id': this.id,
+        'placeholder': placeholder,
+      })
+      .val(value);
 
-    $input.on('keypress', (e) => {
-      if (e.key === 'Enter') {
-        const name = ($input.val() as string || '').trim();
-        if (name.length > 0) {
-          Person.savePerson(newId);
+    const handleSave = (event: JQuery.TriggeredEvent) => {
+      if (event.type === 'keypress' && event.key !== 'Enter') {
+        return;
+      }
+      $input.off('keypress blur');
+
+      const name = ($input.val() as string || '').trim();
+
+      if (name.length > 0) {
+        onSave(name, $input);
+        Wheel.self.names = Person.getNames();
+      } else {
+        if (type === 'edit') {
+          $input.replaceWith(this.getItemNameElement());
+        } else {
+          $input.remove();
         }
       }
-    });
+    };
 
-    $('#people-list').append($('<div class="row">').append($input));
-    $input.focus();
+    $input.on('keypress', handleSave).on('blur', handleSave);
+
+    if (type === 'edit') {
+      const $itemName = $(`#${this._cssId} .item.name`);
+      $itemName.replaceWith($input);
+      $input.trigger('focus');
+    }
+
+    return $input;
+  }
+
+  public static newPerson(): void {
+    new Person('').add();
   }
 
   public static renderAll(): void {
     const $peopleList = $('#people-list');
     Person._people.forEach(person => {
-      $peopleList.append(person.render());
+      $peopleList.append(person.toHTML());
     });
   }
 
-  private static savePerson(newId: number): void {
-    const $input = $(`#new-person-input-${newId}`);
-    const name = ($input.val() as string || '').trim();
+  public static getPeople(): Person[] {
+    return Person._people
+      .filter(person => person.enabled === true);
+  }
 
-    if (name.length > 0) {
-      const person = new Person(name);
-      const $lastRow = $('#people-list .row.person').last();
-      $lastRow.after(person.render());
-      $input.remove();
-    }
+  public static getNames(): string[] {
+    return Person.getPeople().map(person => person.name);
+  }
+
+  public static fromNames(names: string[]): Person[] {
+    return names.map(name => new Person(name));
   }
 };
 
