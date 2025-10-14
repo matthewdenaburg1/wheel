@@ -1,5 +1,6 @@
 import $ from "jquery";
 import Wheel from "./wheel";
+import PersonList from "./person_list";
 
 class Person {
   private _enabled: boolean = true;
@@ -8,16 +9,15 @@ class Person {
   private _cssId: string;
 
   private static _currentId: number = 0;
-  private static _people: Person[] = [];
 
   constructor(name: string) {
     if (name === null) {
       throw new Error('Name cannot be null');
     }
 
+    this._name = name;
     this._id = Person._currentId++;
     this._cssId = `person-${this._id}`;
-    this.name = name;
   }
 
   public get name(): string {
@@ -28,18 +28,12 @@ class Person {
     return this._id;
   }
 
-  public get enabled(): boolean {
-    return this._enabled;
+  public get cssId(): string {
+    return this._cssId;
   }
 
-  public set name(name: string) {
-    this._name = name;
-
-    // if there is a name, add to the list of people.
-    // This prevents blank names from being added to the wheel.
-    if (this.name.length > 0) {
-      Person._people.push(this);
-    }
+  public get enabled(): boolean {
+    return this._enabled;
   }
 
   public set enabled(enabled: boolean) {
@@ -57,9 +51,8 @@ class Person {
     // and if they ARE enabled, turn the hover functinoality on the buttons on
     $element.find('.buttons .icon').toggleClass('hover', this.enabled === true);
 
-    Wheel.self.names = Person.getNames();
+    Wheel.self.names = Person.names;
   }
-
 
   public toString(): string {
     return this._name;
@@ -81,67 +74,23 @@ class Person {
 
     const $itemName = this.getItemNameElement();
 
-    $buttons.find('.edit').on('click', () => this.edit());
-    $buttons.find('.remove').on('click', () => this.remove());
+    $buttons.find('.edit').on('click', this.edit);
+    $buttons.find('.remove').on('click', () => PersonList.instance.remove(this));
 
     $row.append($buttons).append($itemName);
 
     return $row;
   }
 
-  private edit(): void {
+  private edit = (): void => {
     if (this.enabled === false) {
       return;
-    }
-
-    const onSave = (name: string, $input: JQuery<HTMLElement>) => {
-      this.name = name;
-      $input.replaceWith(this.getItemNameElement());
-    };
-    this.renderNameInputElement('edit', onSave);
-  }
-
-  private add(): void {
-    const onSave = (name: string, $input: JQuery<HTMLElement>) => {
-      this.name = name;
-      $input.replaceWith(this.toHTML());
-    }
-    const $input = this.renderNameInputElement('add', onSave);
-    $('#people-list').append($input);
-    $input.trigger('focus');
-  }
-
-  private remove(): void {
-    if (this.enabled === false) {
-      return;
-    }
-
-    $(`#${this._cssId}`).remove();
-  }
-
-  private renderNameInputElement(type: string, onSave: (name: string, $input: JQuery<HTMLElement>) => void): JQuery<HTMLElement> {
-    if (['edit', 'add'].includes(type) === false) {
-      throw new Error('Invalid type for renderNameInputElement');
-    }
-
-    let cssClass: string = 'name-input',
-        placeholder: string = 'Name',
-        value: string = '';
-
-    if (type === 'edit') {
-      cssClass = 'name-edit';
-      value = this.name;
     }
 
     const $input = $('<input />')
-      .addClass(cssClass)
-      .attr({
-        'type': 'text',
-        'id': `person-input-${this.id}`,
-        'data-person-id': this.id,
-        'placeholder': placeholder,
-      })
-      .val(value);
+      .addClass('name-edit')
+      .attr({'type': 'text', 'placeholder': 'New name'})
+      .val(this.name);
 
     const handleSave = (event: JQuery.TriggeredEvent) => {
       if (event.type === 'keypress' && event.key !== 'Enter') {
@@ -151,51 +100,30 @@ class Person {
 
       const name = ($input.val() as string || '').trim();
 
-      if (name.length > 0) {
-        onSave(name, $input);
-        Wheel.self.names = Person.getNames();
+      if (name.length > 0 && name) {
+        this._name = name;
+
+        $input.replaceWith(this.getItemNameElement());
+        Wheel.self.names = PersonList.instance.names;
       } else {
-        if (type === 'edit') {
-          $input.replaceWith(this.getItemNameElement());
-        } else {
-          $input.remove();
-        }
+        // if no input, revert back to what it was
+        $input.replaceWith(this.getItemNameElement());
       }
     };
 
     $input.on('keypress', handleSave).on('blur', handleSave);
 
-    if (type === 'edit') {
-      const $itemName = $(`#${this._cssId} .item.name`);
-      $itemName.replaceWith($input);
-      $input.trigger('focus');
-    }
-
-    return $input;
+    const $itemName = $(`#${this._cssId} .item.name`);
+    $itemName.replaceWith($input);
+    $input.trigger('focus');
   }
 
-  public static newPerson(): void {
-    new Person('').add();
+  public static get people(): PersonList {
+    return PersonList.instance;
   }
 
-  public static renderAll(): void {
-    const $peopleList = $('#people-list');
-    Person._people.forEach(person => {
-      $peopleList.append(person.toHTML());
-    });
-  }
-
-  public static getPeople(): Person[] {
-    return Person._people
-      .filter(person => person.enabled === true);
-  }
-
-  public static getNames(): string[] {
-    return Person.getPeople().map(person => person.name);
-  }
-
-  public static fromNames(names: string[]): Person[] {
-    return names.map(name => new Person(name));
+  public static get names(): string[] {
+    return Person.people.names;
   }
 };
 
