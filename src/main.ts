@@ -10,7 +10,7 @@ $(document).ready(function() {
 
   const people = personList.people;
   if (people.length === 0) {
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 3; i++) {
       people.push(new Person(`Person ${i}`));
     }
   }
@@ -21,5 +21,5 @@ $(document).ready(function() {
   $("#share").on("click", shareUrl);
   $("#theme-toggle").on("click", darkModeToggler());
 
-  new Wheel(personList.names).init();
+  new Wheel();
 });

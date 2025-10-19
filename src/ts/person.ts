@@ -1,6 +1,6 @@
 import $ from "jquery";
-import Wheel from "./wheel";
 import PersonList from "./person_list";
+import { wheelSync } from './wheel_sync_event';
 
 class Person {
   private _enabled: boolean = true;
@@ -51,7 +51,7 @@ class Person {
     // and if they ARE enabled, turn the hover functinoality on the buttons on
     $element.find('.buttons .icon').toggleClass('hover', this.enabled === true);
 
-    Wheel.self.names = Person.names;
+    wheelSync.dispatch();
   }
 
   public toString(): string {
@@ -104,7 +104,7 @@ class Person {
         this._name = name;
 
         $input.replaceWith(this.getItemNameElement());
-        Wheel.self.names = PersonList.instance.names;
+        wheelSync.dispatch();
       } else {
         // if no input, revert back to what it was
         $input.replaceWith(this.getItemNameElement());

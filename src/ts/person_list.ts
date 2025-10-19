@@ -1,6 +1,6 @@
 import $ from "jquery";
 import Person from "./person";
-import Wheel from "./wheel";
+import { wheelSync } from './wheel_sync_event';
 
 class PersonList {
   private _people: Person[] = [];
@@ -27,6 +27,11 @@ class PersonList {
     return this.enabled.map(person => person.name);
   }
 
+  /** the number of enabled people */
+  public get count(): number {
+    return this.enabled.length;
+  }
+
   public add = (): void => {
     const $input = $('<input />')
       .addClass('add')
@@ -46,7 +51,7 @@ class PersonList {
         this.people.push(person);
 
         $input.replaceWith(person.toHTML());
-        Wheel.self.names = this.names;
+        wheelSync.dispatch();
       } else {
         // no input, so abort
         $input.remove();
@@ -58,10 +63,27 @@ class PersonList {
     $input.trigger('focus');
   }
 
-  public remove = (person: Person): void => {
-    if (person.enabled === false) {
+  public remove = (target?: Person, targetId?: number): void => {
+    if (!target && !targetId) {
       return;
     }
+    let person: Person;
+
+    if (target) {
+      person = target;
+    }
+    else if (targetId) {
+      person = this.people.find(person => person.id === targetId);
+    }
+
+    if (!personId) {
+      return;
+    }
+
+    if (person && person.enabled === false) {
+      return;
+    }
+    const id = personId;
 
     const index = this.people
       .map((person) => person.id)
@@ -69,7 +91,7 @@ class PersonList {
 
     this.people.splice(index, 1);
     this.render();
-    Wheel.self.names = this.names;
+    wheelSync.dispatch();
   }
 
   public render = (): void => {
@@ -86,6 +108,10 @@ class PersonList {
 
   public static fromNames(names: string[]): PersonList {
     return new PersonList(...names.map(name => new Person(name)));
+  }
+
+  public static count(): number {
+    return PersonList.instance.count;
   }
 }
 

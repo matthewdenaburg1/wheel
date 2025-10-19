@@ -1,9 +1,13 @@
 import $ from "jquery";
-import Sector from './sector';
+import Angle from "./angle";
+import Color from "./color";
+import Person from "./person";
+import PersonList from "./person_list";
 import confetti from 'canvas-confetti';
+import { wheelSync } from './wheel_sync_event';
 
 class Wheel {
-  static self: Wheel;
+  private static self: Wheel;
   private static _startRadius = 500;
 
   /** the slices on the wheel */
@@ -11,59 +15,47 @@ class Wheel {
   private _radius: number = Wheel._startRadius;
   private _content: JQuery<HTMLElement> = $('<div>').attr('id', 'wheel');
 
-  private _names: Array<string> = [];
+  // private _names: Array<string> = [];
+  private _personList: PersonList = PersonList.instance;
 
   /** Create a new Wheel */
-  constructor(names: Array<string> = []) {
+  constructor() {
     if (Wheel.self) {
       return Wheel.self;
     }
 
-    this._names = names;
     Wheel.self = this;
-  }
-
-  /** Initialize the wheel */
-  init(): this {
-    $("#wheel-container").empty();
 
     this._sectors = [];
     this._content = $('<div>').attr('id', 'wheel');
-
-    $("#wheel-container").append(this._content);
+    $("#wheel-container").empty().append(this._content);
 
     this.draw();
 
-    this._content.on("click", this.spin.bind(this));
-    $("#winner-overlay").on("click", this.hideWinnerOverlay.bind(this));
-    $(window).on("resize", this.draw.bind(this));
-
-    return this;
+    wheelSync.addEventListener('wheel-sync', this.draw.bind(this));
   }
 
   /** Draw the wheel */
   draw(): this {
-    if (this._sectors.length === 0) {
+    if (this._sectors.length === 0) { // TODO: what if there are no people
       this.createSlices();
     }
 
     this.drawSlices();
+    this._content.off("click").on("click", this.spin.bind(this));
+    $("#winner-overlay").off("click").on("click", this.hideWinnerOverlay.bind(this));
+    // $(window).off("resize").on("resize", this.draw.bind(this));
 
     return this;
   }
 
-  public set names(names: string[]) {
-    this._names = names;
-    this.init();
-  }
-
   /** Create the slices */
   private createSlices(): this {
-    const sectorAngle = 360 / this._names.length;
+    const sectorAngle = 360 / this._personList.count;
 
-    this._names.forEach((name: string, index: number) => {
+    this._personList.enabled.forEach((person: Person, index: number) => {
       const angle = index * sectorAngle;
-      const sector = new Sector(Math.floor(angle), name);
+      const sector = new Sector(Math.floor(angle), person);
       this._sectors.push(sector);
     });
 
@@ -73,8 +65,7 @@ class Wheel {
   private drawSlices(): this {
     this._content.empty();
 
-    const sectorAngle = 360 / this._sectors.length;
-    Sector.setCount(this._sectors.length);
+    const sectorAngle = 360 / this._personList.count;
 
     this._sectors.forEach((sector, index) => {
       let angle = index * sectorAngle - sectorAngle / 2;
@@ -82,7 +73,7 @@ class Wheel {
       sector.radius = this._radius;
 
       // if there is only one sector, make it a full circle
-      if (this._sectors.length === 1) {
+      if (this._personList.enabled.length === 1) {
         sector.finalAngle = 359.9999;
         angle = 0;
       }
@@ -100,9 +91,9 @@ class Wheel {
 
   /** Spin the wheel */
   private spin(): this {
-    const count = this._sectors.length;
+    const count = this._personList.count;
     // select random sector
-    const index = Math.floor(Math.random() * count)
+    const index = Math.floor(Math.random() * count);
     // do at most 3 rotations, and stop at that sector's angle
     const angle = Math.floor(Math.random() * 2 + 1) * 360 - 360 / count * index;
 
@@ -118,7 +109,7 @@ class Wheel {
       });
 
       // remove selected person
-      this.showWinnerOverlay(index);
+      this.showWinnerOverlay(this._personList.enabled[index]);
     }, 1500); // Reset animation
 
     return this;
@@ -127,9 +118,11 @@ class Wheel {
   /** Show the winner
    * @param {number} index - the index of the winner
    */
-  private showWinnerOverlay(index: number): this {
+  private showWinnerOverlay(person: Person): this {
     // add the winner to the overlay
-    $("#winner-name").text(this._sectors[index].text);
+    $("#winner-name")
+      .attr('data-person-id', person.id)
+      .text(person.name);
     // show the overlay
     $("#winner-overlay").show();
 
@@ -141,13 +134,14 @@ class Wheel {
       origin: { y: 0.6 }
     });
 
-    // remove the winner from the wheel
-    this._sectors.splice(index, 1);
-
     return this;
   }
 
   private hideWinnerOverlay(): this {
+    const personId = $("#winner-name").attr('data-person-id') as unknown as number;
+    const person = PersonList.instance.get(personId);
+    PersonList.instance.remove(person);
+
     // reset the wheel angle
     this._content.css({
       transition: 'transform',
@@ -161,6 +155,126 @@ class Wheel {
     this.drawSlices();
 
     return this;
+  }
+}
+
+class Sector {
+  private _initialAngle: Angle = new Angle(0);
+  private _finalAngle: Angle = new Angle(0);
+  private _backgroundColor: Color;
+  private _radius: number = 0;
+  private _person: Person;
+
+  /**
+   * @param colorAngle the angle this Sector is oriented to.
+   */
+  constructor(colorAngle: number, person: Person) {
+    this._backgroundColor = new Color(`hsl(${Math.floor(colorAngle)}, 100%, 45%)`);
+    this._person = person;
+  }
+
+  private toPolarPoint(angle: Angle): string {
+    let x: number = this._radius + this._radius * Math.cos(angle.radians);
+    let y: number = this._radius + this._radius * Math.sin(angle.radians);
+
+    // divide by 2 since we're starting from the center
+    x /= 2;
+    y /= 2;
+
+    // to 3 decimal places
+    x = Math.round(x * 1000) / 1000;
+    y = Math.round(y * 1000) / 1000;
+
+    return this.convertPointToString({ x, y });
+  }
+
+  private convertPointToString(point: { x: number, y: number }): string {
+    return `${point.x} ${point.y}`;
+  }
+
+  get clipPath(): string {
+    // center of the circle
+    const center = this.convertPointToString({ x: this._radius / 2, y: this._radius / 2} );
+    // start point of the arc
+    const radiusPoint = this.toPolarPoint(this._initialAngle);
+    // end point of the arc
+    const arcPoint = this.toPolarPoint(this._finalAngle);
+
+    const arc = [
+      center,
+      this._initialAngle.degrees,
+      this._finalAngle.degrees > 180 ? 1 : 0, // large-arc flag
+      1,
+      arcPoint
+    ].join(' ');
+
+    const path = [
+      `M ${center}`, // move to center
+      `L ${radiusPoint}`, // line to start point
+      `A ${arc}`, // arc to end point
+      'Z' // close path
+    ].join(' ')
+
+    return `path("${path}")`;
+  }
+
+  toHtml(): JQuery<HTMLElement> {
+    const $slice = $('<div>')
+      .addClass('slice')
+      .css({
+        backgroundColor: this._backgroundColor.toString(),
+        clipPath: this.clipPath,
+      });
+
+    const finalAngle = PersonList.count() > 1 ? this._finalAngle.degrees : 0.01;
+
+    const $text = $('<div>')
+      .addClass('name')
+      .addClass(this._backgroundColor.isDark ? 'dark' : 'light')
+      .text(this.person.name)
+      .css({
+        top: `calc(50% - ${this.chord / 4}px + 1rem)`,
+        height: `${this.chord / 2}px`,
+
+        // counteract the rotation of the sector when it's added to the wheel
+        transform: `rotate(${finalAngle / 2}deg)`,
+        transformOrigin: 'left'
+      });
+
+    $slice.append($text);
+    return $slice;
+  }
+
+  get person(): Person {
+    return this._person;
+  }
+
+  get finalAngle(): Angle {
+    return this._finalAngle;
+  }
+
+  /**
+   * A chord of a circle is a straight line segment whose endpoints both lie on a circular arc.
+   * @see https://en.wikipedia.org/wiki/Chord_(geometry)
+   */
+  get chord(): number {
+    if (PersonList.count() <= 1) {
+      return this._radius;
+    }
+
+    return this._radius * Math.sin(this._finalAngle.radians / 2);
+  }
+
+  set finalAngle(newAngle: number) {
+    this._finalAngle = new Angle(newAngle);
+  }
+
+  get radius(): number {
+    return this._radius;
+  }
+
+  set radius(newRadius: number) {
+    this._radius = newRadius;
   }
 }
 
