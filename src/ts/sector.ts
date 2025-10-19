@@ -1,6 +1,7 @@
 import $ from "jquery";
 import Angle from "./angle";
 import Color from "./color";
+import Person from "./person";
 
 class Sector {
   private static count: number = 0;
@@ -8,14 +9,14 @@ class Sector {
   private _finalAngle: Angle = new Angle(0);
   private _backgroundColor: Color;
   private _radius: number = 0;
-  private _text: string = '';
+  private _person: Person;
 
   /**
    * @param colorAngle the angle this Sector is oriented to.
    */
-  constructor(colorAngle: number, text: string) {
+  constructor(colorAngle: number, person: Person) {
     this._backgroundColor = new Color(`hsl(${Math.floor(colorAngle)}, 100%, 45%)`);
-    this._text = text;
+    this._person = person;
   }
 
   private toPolarPoint(angle: Angle): string {
@@ -76,7 +77,7 @@ class Sector {
     const $text = $('<div>')
       .addClass('name')
       .addClass(this._backgroundColor.isDark ? 'dark' : 'light')
-      .text(this._text)
+      .text(this.person.name)
       .css({
         top: `calc(50% - ${this.chord / 4}px + 1rem)`,
         height: `${this.chord / 2}px`,
@@ -90,8 +91,8 @@ class Sector {
     return $slice;
   }
 
-  get text(): string {
-    return this._text;
+  get person(): Person {
+    return this._person;
   }
 
   get finalAngle(): Angle {

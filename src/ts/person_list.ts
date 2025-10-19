@@ -1,14 +1,14 @@
 import $ from "jquery";
 import Person from "./person";
-import Wheel from "./wheel";
+import { wheelSync } from "./wheel_event";
 
 class PersonList {
   private _people: Person[] = [];
   private static _instance: PersonList;
 
   constructor(...people: Person[]) {
-    if (PersonList.instance) {
-      return PersonList.instance;
+    if (PersonList._instance) {
+      return PersonList._instance;
     }
 
     this._people = people || [];
@@ -23,70 +23,67 @@ class PersonList {
     return this.people.filter(person => person.enabled === true);
   }
 
+  /** the names of all enabled people */
   public get names(): string[] {
     return this.enabled.map(person => person.name);
   }
 
-  public add = (): void => {
-    const $input = $('<input />')
-      .addClass('add')
-      .attr({'type': 'text', 'placeholder': 'New name'});
+  public get allNames(): string[] {
+    return this.people.map(person => person.name);
+  }
 
-    const handleSave = (event: JQuery.TriggeredEvent) => {
-      if (event.type === 'keypress' && event.key !== 'Enter') {
-        return;
-      }
-      $input.off('keypress blur');
+  /** the number of enabled people */
+  public get count(): number {
+    return this.enabled.length;
+  }
 
-      const name = ($input.val() as string || '').trim();
+  public get fullCount(): number {
+    return this.people.length;
+  }
 
-      if (name.length > 0) {
-        // if there is input, add the person
-        const person = new Person(name);
-        this.people.push(person);
-
-        $input.replaceWith(person.toHTML());
-        Wheel.self.names = this.names;
-      } else {
-        // no input, so abort
-        $input.remove();
-      }
-    };
-
-    $input.on('keypress', handleSave).on('blur', handleSave);
-    $('#people-list').append($input);
-    $input.trigger('focus');
+  public add(person: Person): void {
+    this.people.push(person);
+    this.render();
   }
 
   public remove = (person: Person): void => {
-    if (person.enabled === false) {
-      return;
-    }
-
     const index = this.people
       .map((person) => person.id)
       .indexOf(person.id);
 
     this.people.splice(index, 1);
     this.render();
-    Wheel.self.names = this.names;
   }
 
   public render = (): void => {
-    const $peopleList = $('#people-list');
+    const $peopleList = $("#people-list");
     $peopleList.empty();
     this.people.forEach(person => {
       $peopleList.append(person.toHTML());
     });
+    this.syncWheel();
   }
 
-  public static get instance(): PersonList {
-    return PersonList._instance;
+  public fromNames(names: string[]): this {
+    this._people = names.map(name => new Person(name));
+
+    return this;
   }
 
-  public static fromNames(names: string[]): PersonList {
-    return new PersonList(...names.map(name => new Person(name)));
+  public getNextWinner(): { person: Person, count: number, index: number } {
+    const count = this.count;
+    const index = Math.floor(Math.random() * count);
+    const person = this.people[index];
+    person.isCurrentWinner = true;
+
+    return { person, count, index };
+  }
+
+  private syncWheel(): void {
+    wheelSync.sync();
   }
 }
 
-export default PersonList;
+const personList = new PersonList();
+
+export { personList, PersonList };
