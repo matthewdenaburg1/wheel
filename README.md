@@ -1,6 +1,6 @@
 # Wheel of Names
 
-<https://matthewdenaburgvc.github.io/wheel>
+<https://matthewdenaburg1.github.io/wheel>
 
 ## Features
 
