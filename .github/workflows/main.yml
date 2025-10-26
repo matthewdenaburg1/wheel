@@ -1,9 +1,7 @@
 name: build and deploy main
 
 on:
-  schedule:
-    # 8 am every weekday
-    - cron: '0 8 * * 1-5'
+  workflow_dispatch:
 
   push:
     branches:
