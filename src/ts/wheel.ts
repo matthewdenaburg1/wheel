@@ -2,9 +2,9 @@ import $ from "jquery";
 import Angle from "./angle";
 import Color from "./color";
 import Person from "./person";
-import PersonList from "./person_list";
+import { personList } from "./person_list";
 import confetti from 'canvas-confetti';
-import { wheelSync } from './wheel_sync_event';
+import { wheelSync } from './wheel_event';
 
 class Wheel {
   private static self: Wheel;
@@ -14,9 +14,7 @@ class Wheel {
   private _sectors: Array<Sector> = [];
   private _radius: number = Wheel._startRadius;
   private _content: JQuery<HTMLElement> = $('<div>').attr('id', 'wheel');
-
-  // private _names: Array<string> = [];
-  private _personList: PersonList = PersonList.instance;
+  private _currentWinner: Person | null = null;
 
   /** Create a new Wheel */
   constructor() {
@@ -36,7 +34,7 @@ class Wheel {
   }
 
   /** Draw the wheel */
-  draw(): this {
+  draw = (): this => {
     if (this._sectors.length === 0) { // TODO: what if there are no people
       this.createSlices();
     }
@@ -51,9 +49,9 @@ class Wheel {
 
   /** Create the slices */
   private createSlices(): this {
-    const sectorAngle = 360 / this._personList.count;
+    const sectorAngle = 360 / personList.count;
 
-    this._personList.enabled.forEach((person: Person, index: number) => {
+    personList.enabled.forEach((person: Person, index: number) => {
       const angle = index * sectorAngle;
       const sector = new Sector(Math.floor(angle), person);
       this._sectors.push(sector);
@@ -65,7 +63,7 @@ class Wheel {
   private drawSlices(): this {
     this._content.empty();
 
-    const sectorAngle = 360 / this._personList.count;
+    const sectorAngle = 360 / personList.count;
 
     this._sectors.forEach((sector, index) => {
       let angle = index * sectorAngle - sectorAngle / 2;
@@ -73,7 +71,7 @@ class Wheel {
       sector.radius = this._radius;
 
       // if there is only one sector, make it a full circle
-      if (this._personList.enabled.length === 1) {
+      if (personList.enabled.length === 1) {
         sector.finalAngle = 359.9999;
         angle = 0;
       }
@@ -91,9 +89,9 @@ class Wheel {
 
   /** Spin the wheel */
   private spin(): this {
-    const count = this._personList.count;
-    // select random sector
-    const index = Math.floor(Math.random() * count);
+    const {person, count, index} = personList.getNextWinner();
+    this._currentWinner = person;
+
     // do at most 3 rotations, and stop at that sector's angle
     const angle = Math.floor(Math.random() * 2 + 1) * 360 - 360 / count * index;
 
@@ -109,20 +107,24 @@ class Wheel {
       });
 
       // remove selected person
-      this.showWinnerOverlay(this._personList.enabled[index]);
+      this.showWinnerOverlay();
     }, 1500); // Reset animation
 
     return this;
   }
 
-  /** Show the winner
-   * @param {number} index - the index of the winner
-   */
-  private showWinnerOverlay(person: Person): this {
+  /** Show the winner */
+  private showWinnerOverlay(): this {
+    if (this._currentWinner === null) {
+      return this;
+    }
+
+    this._currentWinner.isCurrentWinner = false;
+
     // add the winner to the overlay
     $("#winner-name")
-      .attr('data-person-id', person.id)
-      .text(person.name);
+      .attr('data-person-id', this._currentWinner.id)
+      .text(this._currentWinner.name);
     // show the overlay
     $("#winner-overlay").show();
 
@@ -138,9 +140,9 @@ class Wheel {
   }
 
   private hideWinnerOverlay(): this {
-    const personId = $("#winner-name").attr('data-person-id') as unknown as number;
-    const person = PersonList.instance.get(personId);
-    PersonList.instance.remove(person);
+    if (this._currentWinner === null) {
+      return this;
+    }
 
     // reset the wheel angle
     this._content.css({
@@ -148,8 +150,10 @@ class Wheel {
       transform: 'rotate(0deg)',
     });
 
-    // hide the overlay
+    // hide the overlay and deactivate the person
     $("#winner-overlay").hide();
+    this._currentWinner.enabled = false;
+    this._currentWinner = null;
 
     // redraw the wheel
     this.drawSlices();
@@ -218,7 +222,9 @@ class Sector {
     return `path("${path}")`;
   }
 
-  toHtml(): JQuery<HTMLElement> {
+  toHtml = (): JQuery<HTMLElement> => {
+    // console.log(this.person.name)
+
     const $slice = $('<div>')
       .addClass('slice')
       .css({
@@ -226,7 +232,7 @@ class Sector {
         clipPath: this.clipPath,
       });
 
-    const finalAngle = PersonList.count() > 1 ? this._finalAngle.degrees : 0.01;
+    const finalAngle = personList.count > 1 ? this._finalAngle.degrees : 0.01;
 
     const $text = $('<div>')
       .addClass('name')
@@ -258,7 +264,7 @@ class Sector {
    * @see https://en.wikipedia.org/wiki/Chord_(geometry)
    */
   get chord(): number {
-    if (PersonList.count() <= 1) {
+    if (personList.count <= 1) {
       return this._radius;
     }
 
@@ -275,6 +281,21 @@ class Sector {
 
   set radius(newRadius: number) {
     this._radius = newRadius;
+  }
+
+  sync(index: number): void {
+    let sectorAngle: number,
+        angle: number;
+
+    if (personList.enabled.length === 1) {
+      sectorAngle = 359.9999;
+      angle = 0;
+    } else {
+      sectorAngle = 360 / personList.enabled.length;
+      angle = index * sectorAngle - sectorAngle / 2;
+    }
+
+    this._finalAngle = new Angle(sectorAngle);
   }
 }
 

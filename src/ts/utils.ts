@@ -1,5 +1,5 @@
 import $ from "jquery";
-import PersonList from "./person_list";
+import { personList } from "./person_list";
 
 declare global {
   interface Array<T> {
@@ -74,7 +74,7 @@ function loadNamesFromUrl(): Array<string> {
 }
 
 function shareUrl(): void {
-  const names = PersonList.instance.people
+  const names = personList.people
     .map(person => person.name)
     .map(encodeURIComponent)
     .join('&name=');

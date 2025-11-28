@@ -1,23 +1,30 @@
 import $ from "jquery";
-import PersonList from "./person_list";
-import { wheelSync } from './wheel_sync_event';
+import { personList } from "./person_list";
 
 class Person {
-  private _enabled: boolean = true;
-  private _name: string = '';
+  private _name: string;
   private _id: number;
   private _cssId: string;
+  private _enabled: boolean;
+  private _isBeingEdited: boolean;
+  private _isNew: boolean;
+
+  isCurrentWinner: boolean;
 
   private static _currentId: number = 0;
 
   constructor(name: string) {
     if (name === null) {
-      throw new Error('Name cannot be null');
+      throw new Error('A Name is required');
     }
 
     this._name = name;
     this._id = Person._currentId++;
     this._cssId = `person-${this._id}`;
+    this._enabled = true;
+    this._isNew = false;
+    this._isBeingEdited = false;
+    this.isCurrentWinner = false;
   }
 
   public get name(): string {
@@ -36,94 +43,113 @@ class Person {
     return this._enabled;
   }
 
-  public set enabled(enabled: boolean) {
-    // return if not different
-    if (this.enabled === enabled) {
+  public set enabled(value: boolean) {
+    if (this.enabled === value) {
       return;
     }
 
-    // update
-    this._enabled = enabled;
-
-    const $element = $(`#${this._cssId}`);
-    // add `disabled` if the person is
-    $element.toggleClass('disabled', this.enabled === false);
-    // and if they ARE enabled, turn the hover functinoality on the buttons on
-    $element.find('.buttons .icon').toggleClass('hover', this.enabled === true);
-
-    wheelSync.dispatch();
+    this._enabled = value;
+    this.syncEnabledStatus();
   }
 
   public toString(): string {
     return this._name;
   }
 
-  private getItemNameElement(): JQuery<HTMLElement> {
-    return $('<div>')
-      .addClass('item name hover')
-      .append($(`<span class="icon">${this._name}</span>`))
-      .on('click', () => { this.enabled = !this.enabled; });
-  }
-
   public toHTML(): JQuery<HTMLElement> {
-    const $row = $("<div>").addClass('row person').attr('id', this._cssId);
+    const $row = $("<div>")
+      .addClass(`row person ${this.enabled ? "" : "disabled"}`)
+      .attr('id', this._cssId);
+
+    // TODO: does this **need** to be a div of spans?
     const $buttons = $(`<div class="item buttons">
       <span class="icon hover remove fa fa-trash" title="Remove"></span>
       <span class="icon hover edit fa fa-edit" title="Edit"></span>
-    </div>`);
+      </div>`);
+    $buttons.find('.edit').on('click', this.edit.bind(this));
+    $buttons.find('.remove').on('click', this.remove.bind(this));
 
-    const $itemName = this.getItemNameElement();
+    const $nameDiv = $("<div class='item name'>")
+      .append($("<span class='icon'>").text(this._name))
+      .on('click', () => { this.enabled = !this.enabled; } );// this.toggle.bind(this));
 
-    $buttons.find('.edit').on('click', this.edit);
-    $buttons.find('.remove').on('click', () => PersonList.instance.remove(this));
+    const $input = $(`<input id="${this._cssId}-input" class='name-input name-edit' type='text' placeholder='New name' />`)
+      .hide()
+      .on('keypress blur', this.save.bind(this));
 
-    $row.append($buttons).append($itemName);
+    $row.append($buttons, $nameDiv, $input);
 
     return $row;
   }
 
-  private edit = (): void => {
-    if (this.enabled === false) {
+  private syncEnabledStatus = (): void => {
+    const $person = $(`#${this._cssId}`);
+    // add `disabled` if the person is disabled
+    $person.toggleClass("disabled", !this.enabled);
+
+    personList.render();
+  }
+
+  private remove = (): void => {
+    if (!this.enabled) {
+      return;
+    }
+    if (this._isBeingEdited) {
       return;
     }
 
-    const $input = $('<input />')
-      .addClass('name-edit')
-      .attr({'type': 'text', 'placeholder': 'New name'})
-      .val(this.name);
-
-    const handleSave = (event: JQuery.TriggeredEvent) => {
-      if (event.type === 'keypress' && event.key !== 'Enter') {
-        return;
-      }
-      $input.off('keypress blur');
-
-      const name = ($input.val() as string || '').trim();
-
-      if (name.length > 0 && name) {
-        this._name = name;
-
-        $input.replaceWith(this.getItemNameElement());
-        wheelSync.dispatch();
-      } else {
-        // if no input, revert back to what it was
-        $input.replaceWith(this.getItemNameElement());
-      }
-    };
-
-    $input.on('keypress', handleSave).on('blur', handleSave);
-
-    const $itemName = $(`#${this._cssId} .item.name`);
-    $itemName.replaceWith($input);
-    $input.trigger('focus');
+    personList.remove(this);
   }
 
-  public static get people(): PersonList {
-    return PersonList.instance;
+  private edit = (): void => {
+    if (!this.enabled) {
+      return;
+    }
+    this._isBeingEdited = true;
+
+    const $this = $(`#${this._cssId}`);
+    $this.find('.item.name').toggle();
+    $this.find('input.name-input').val(this.name).toggle().trigger('focus');
   }
 
-  public static get names(): string[] {
-    return Person.people.names;
+  private save = (event: JQuery.TriggeredEvent): void => {
+    if (!this._isBeingEdited) {
+      return;
+    }
+    if (event.type !== 'keypress' && event.type !== 'blur') {
+      return;
+    }
+    if  (event.type === 'keypress' && event.key !== 'Enter') {
+      return;
+    }
+
+    const $person = $(`#${this._cssId}`);
+    const $input = $person.find('.name-input')
+
+    const name = ($input.val() as string || '').trim();
+    if (name && name.length > 0) {
+      this._name = name;
+      $person.find('.item.name .icon').text(this._name);
+
+      if (this._isNew) {
+        this._isNew = false;
+        personList.add(this);
+      }
+    }
+
+    $input.toggle().removeClass('edit');
+    this._isBeingEdited = false;
+    $person.find('.item.name').toggle();
+    personList.render();
+  }
+
+  static add(): void {
+    const newPerson = new Person("");
+    newPerson._isNew = true;
+    const $person = newPerson.toHTML()
+
+    $("#people-list").append($person);
+    newPerson.edit();
   }
 };
 
