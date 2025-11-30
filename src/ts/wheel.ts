@@ -1,26 +1,26 @@
-import Sector from './sector.js';
-import Color from './color.js';
+import $ from "jquery";
+import Sector from './sector';
 import confetti from 'canvas-confetti';
+import Color from "./color";
 
 class Wheel {
-  static self = null;
+  static self: Wheel;
+  public static permanentlyRemovedNames: Array<string> = [];
 
   /** the slices on the wheel */
-  private _sectors: Array<Sector> = null;
-  private _radius: number = null;
+  private _sectors: Array<Sector> = [];
+  private _radius: number = 100;
+  private _content: JQuery = $('<div>').attr('id', 'wheel');
 
-  names: Array<string> = null;
-  wheel: JQuery = null;
+  names: Array<string> = [];
 
   /** Create a new Wheel */
-  constructor(names: Array<string>) {
+  constructor(names: Array<string> = []) {
     if (Wheel.self) {
       return Wheel.self;
     }
 
     this.names = names || [];
-    this.wheel = null;
-    this._sectors = [];
     this._radius = 100;
 
     Wheel.self = this;
@@ -31,16 +31,15 @@ class Wheel {
     $("#wheel-container").empty();
 
     this._sectors = [];
-    this.wheel = $('<div>').attr('id', 'wheel');
+    this._content = $('<div>').attr('id', 'wheel');
 
-    $("#wheel-container").append(this.wheel);
+    $("#wheel-container").append(this._content);
 
     this.draw();
 
-    this.wheel.click(this.spin.bind(this));
-
+    this._content.on("click", this.spin.bind(this));
     $("#winner-overlay").on("click", this.hideWinnerOverlay.bind(this));
-    $(window).on("resize", this.draw.bind(this));
+    $(globalThis).on("resize", this.draw.bind(this));
 
     return this;
   }
@@ -59,13 +58,13 @@ class Wheel {
 
   /** Resize the wheel */
   private resize(): this {
-    let parentWidth: number = this.wheel.parent().width();
-    let parentHeight: number = this.wheel.parent().height();
+    let parentWidth: number = this._content.parent().width() || 100;
+    let parentHeight: number = this._content.parent().height() || 100;
 
     this._radius = Math.min(parentWidth, parentHeight);
     this._radius = Math.round(this._radius);
 
-    this.wheel.css({
+    this._content.css({
       width: this._radius + 'px',
       height: this._radius + 'px'
     });
@@ -78,9 +77,9 @@ class Wheel {
     const sectorAngle = 360 / this.names.length;
 
     this.names.forEach((name: string, index: number) => {
-      const angle = index * sectorAngle;
-      const backgroundColor = new Color(`hsl(${Math.floor(angle)}, 100%, 45%)`);
-      const sector = new Sector(backgroundColor, name);
+      const angle = Math.floor(index * sectorAngle);
+      const colorString = `hsl(${angle}, 100%, 45%)`;
+      const sector = new Sector(new Color(colorString), name);
       this._sectors.push(sector);
     });
 
@@ -88,10 +87,10 @@ class Wheel {
   }
 
   private drawSlices(): this {
-    this.wheel.empty();
+    this._content.empty();
 
     const sectorAngle = 360 / this._sectors.length;
-    Sector.updateCount(this._sectors.length);
+    Sector.setCount(this._sectors.length);
 
     this._sectors.forEach((sector, index) => {
       let angle = index * sectorAngle - sectorAngle / 2;
@@ -104,7 +103,7 @@ class Wheel {
         angle = 0;
       }
 
-      this.wheel.append(
+      this._content.append(
         sector.toHtml().css({
           // rotate the sector to the correct angle
           transform: `rotate(${angle}deg)`,
@@ -123,14 +122,14 @@ class Wheel {
     // do at most 3 rotations, and stop at that sector's angle
     const angle = Math.floor(Math.random() * 2 + 1) * 360 - 360 / count * index;
 
-    this.wheel.css({
+    this._content.css({
       transition: 'transform 1.5s ease-out',
       transform: `rotate(${angle}deg)`,
     });
 
     setTimeout(() => {
       // stop rotation
-      this.wheel.css({
+      this._content.css({
         transition: 'none',
       });
 
@@ -145,8 +144,15 @@ class Wheel {
    * @param {number} index - the index of the winner
    */
   private showWinnerOverlay(index: number): this {
+    const winnerName = this._sectors[index].text;
+
+    // Add winner to permanentlyRemovedNames, ensuring no duplicates
+    if (!Wheel.permanentlyRemovedNames.includes(winnerName)) {
+      Wheel.permanentlyRemovedNames.push(winnerName);
+    }
+
     // add the winner to the overlay
-    $("#winner-name").text(this._sectors[index].text);
+    $("#winner-name").text(winnerName);
     // show the overlay
     $("#winner-overlay").show();
 
@@ -166,7 +172,7 @@ class Wheel {
 
   private hideWinnerOverlay(): this {
     // reset the wheel angle
-    this.wheel.css({
+    this._content.css({
       transition: 'transform',
       transform: 'rotate(0deg)',
     });
