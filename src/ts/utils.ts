@@ -7,10 +7,21 @@ declare global {
   }
 }
 
-Array.prototype.randomize = function() {
-  // randomize objects
-  return this.sort(() => Math.random() - 0.5);
+function randonInt(max: number): number {
+  return Math.floor(Math.random() * max);
 }
+
+Array.prototype.randomize = function () {
+  // randomize objects
+  for (let index = this.length - 1; index >= 1; index--) {
+    let randomIndex = randonInt(index);
+    let tempValue = this[randomIndex];
+
+    this[randomIndex] = this[index];
+    this[index] = tempValue;
+  }
+  return this;
+};
 
 /**
  * Toggles between light and dark mode
