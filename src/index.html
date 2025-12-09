@@ -6,37 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body class="dark-mode">
-    <div id="content" class='wrapper'>
-      <section class="left">
-        <div class="header">
-          <h1>Wheel of Names</h1>
+    <div class="header">
+      <h1>Wheel of Names</h1>
+    </div>
 
-          <div class="menu">
-            <ul>
-              <li class="menu-item" id="share"></li>
-              <li class="menu-item" id="theme-toggle"></li>
-            </ul>
-          </div>
-        </div>
-        <div class="content" id="configure">
-          <div id="configure-people">
-            <textarea name="people-input" id="people-input"></textarea>
-            <button id="go-button">Go</button>
-          </div>
-          <div id="people">
-            <div>
-              <ul/>
+    <div id="content">
+      <div class="controls">
+        <div class="list menu" id="menu">
+          <div class="row">
+            <div class="item">
+              <span class="icon hover fa fa-regular fa-square-plus" id="new-name" title="Add name"></span>
+              <span class="icon hover fa fa-share" id="share" title="Share"></span>
+              <span class="icon hover fa fa-lightbulb" id="theme-toggle" title="Toggle theme"></span>
             </div>
-            <button id="edit-button">Edit</button>
           </div>
         </div>
-      </section>
-      <section class="right">
-        <div class="content" id="wheel-container"></div>
-      </section>
+        <div class="list people" id="people-list"></div>
+      </div>
+      <div class="wheel">
+        <div id="wheel-container"></div>
+      </div>
     </div>
     <div id="fork-me">
-      <div class="wrapper"><a href="https://github.com/matthewdenaburgvc/wheel">Fork me on GitHub</a></div>
+      <div class="wrapper"><a href="https://github.com/matthewdenaburg1/wheel" target="_blank">Fork me on GitHub</a></div>
     </div>
     <div id="winner-overlay" class="hidden">
       <div class="winner-box">
