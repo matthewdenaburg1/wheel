@@ -73,7 +73,7 @@ class PersonList {
   public getNextWinner(): { person: Person, count: number, index: number } {
     const count = this.count;
     const index = Math.floor(Math.random() * count);
-    const person = this.people[index];
+    const person = this.enabled[index];
     person.isCurrentWinner = true;
 
     return { person, count, index };
