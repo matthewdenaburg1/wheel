@@ -1,14 +1,32 @@
 import React from 'react';
 import styles from './NameList.module.scss';
-import { Person } from './App';
+import { Person } from '../App';
 
 interface NameListProps {
   people: Person[];
-  onRemoveName: (id: number) => void;
-  onToggleEnabled: (id: number) => void;
+  setPeople: React.Dispatch<React.SetStateAction<Person[]>>;
 }
 
-const NameList: React.FC<NameListProps> = ({ people, onRemoveName, onToggleEnabled }) => {
+const NameList: React.FC<NameListProps> = ({ people, setPeople }) => {
+  const handleRemoveName = (id: number) => {
+    const person = people.find((person) => person.id === id);
+
+    if (person && person.enabled) {
+      setPeople(people.filter((person) => person.id !== id));
+    }
+  };
+
+  const handleToggleEnabled = (id: number) => {
+    setPeople(
+      people.map((person) =>
+        person.id === id ? { ...person, enabled: !person.enabled } : person
+      )
+    );
+  };
+
+  // const handleEditName = (person: Person) => {
+  // };
+
   return (
     <div className={styles.nameList}>
       {people.map((person) => (
@@ -16,16 +34,20 @@ const NameList: React.FC<NameListProps> = ({ people, onRemoveName, onToggleEnabl
           key={person.id}
           className={`${styles.person} ${!person.enabled ? styles.disabled : ''}`}
         >
-          <input
-            type="checkbox"
-            checked={person.enabled}
-            onChange={() => onToggleEnabled(person.id)}
-            className={styles.checkbox}
-          />
-          <span className={styles.name}>{person.name}</span>
+          <label
+            id={`checkbox-${person.id}`}
+            className={[styles.name, styles.button].join(' ')}
+            onClick={() => handleToggleEnabled(person.id)}
+          >
+            {person.name}
+          </label>
+          {/* <button
+            onClick={() => handleEditName(person)}
+          >
+            <span className="fa fa-regular fa-edit"></span>
+          </button> */}
           <button
-            className={styles.removeButton}
-            onClick={() => onRemoveName(person.id)}
+            onClick={() => handleRemoveName(person.id)}
           >
             <span className="fa fa-regular fa-trash-can"></span>
           </button>

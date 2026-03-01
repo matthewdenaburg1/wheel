@@ -1,57 +1,37 @@
 import React from 'react';
 import styles from './Sector.module.scss';
-import { getHslColor, isColorDark } from '../utils/color';
+import { isColorDark } from '../utils/color';
 
 interface SectorProps {
   name: string;
-  angle: number;
-  startAngle: number;
-  radius: number;
-  disabled: boolean;
+  sectorData: {
+    path: string;
+    color: string;
+    /** @see https://en.wikipedia.org/wiki/Chord_(geometry) */
+    chord: number;
+  };
+  index: number;
+  sectorAngle: number;
 }
 
-const degreesToRadians = (angle: number): number => {
-  return angle * (Math.PI / 180);
-};
-
-const Sector: React.FC<SectorProps> = ({ name, angle, startAngle, radius, disabled }) => {
-  const backgroundColor = getHslColor(startAngle);
-
-  const toPolarPoint = (angleDegrees: number): { x: number; y: number } => {
-    const angleRadians = degreesToRadians(angleDegrees);
-    const x = radius + radius * Math.cos(angleRadians);
-    const y = radius + radius * Math.sin(angleRadians);
-    return { x, y };
-  };
-
-  const startPoint = toPolarPoint(0);
-  const endPoint = toPolarPoint(angle);
-  const largeArcFlag = angle > 180 ? 1 : 0;
-
-  const pathData = [
-    `M ${radius},${radius}`,
-    `L ${startPoint.x},${startPoint.y}`,
-    `A ${radius},${radius} 0 ${largeArcFlag} 1 ${endPoint.x},${endPoint.y}`,
-    'Z',
-  ].join(' ');
-
-  const chord = 2 * radius * Math.sin(degreesToRadians(angle) / 2);
-
+const Sector: React.FC<SectorProps> = ({ name, sectorData, index, sectorAngle }) => {
   return (
     <div
-      className={`${styles.slice} ${disabled ? styles.disabled : ''}`}
+      className={`${styles.slice} `}
       style={{
-        backgroundColor,
-        clipPath: `path("${pathData}")`,
-        transform: `rotate(${startAngle}deg)`,
+        backgroundColor: sectorData.color,
+        clipPath: `path("${sectorData.path}")`,
+        transform: `rotate(${index * sectorAngle - sectorAngle / 2}deg)`,
       }}
     >
       <div
-        className={`${styles.name} ${isColorDark(backgroundColor) ? styles.dark : styles.light}`}
+        className={`${styles.name} ${isColorDark(sectorData.color) ? styles.dark : styles.light}`}
         style={{
-          top: `calc(50% - ${chord / 4}px + 1rem)`,
-          height: `${chord / 2}px`,
-          transform: `rotate(${angle / 2}deg)`,
+          top: `calc(50% - 0.5em)`,
+
+          // counteract the rotation of the sector when it's added to the wheel
+          transform: `rotate(${sectorAngle / 2}deg)`,
+          transformOrigin: 'left'
         }}
       >
         {name}

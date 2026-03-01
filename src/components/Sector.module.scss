@@ -4,17 +4,23 @@
   height: 100%;
   padding: 0;
   margin: 0;
-  transform-origin: 50% 50%;
 
   .name {
     display: block;
     align-content: center;
     text-align: right;
     position: relative;
+    // make sure the name stays visible inside the circle
     width: calc(50% - 2rem);
-    left: calc(50% + 1rem);
+    left: 50%;
     transform-origin: left;
-    color: var(--text-color);
+
+    &.dark {
+      color: #fff;
+    }
+    &.light {
+      color: #000;
+    }
   }
 
   &.disabled {

@@ -19,16 +19,56 @@ export const isColorDark = (hslColor: string): boolean => {
     return false; // Default to not dark if parsing fails
   }
 
-  const h = parseInt(hsl[1], 10);
-  const s = parseInt(hsl[2], 10) / 100;
-  const l = parseInt(hsl[3], 10) / 100;
+  const h = parseInt(hsl[1]);
+  const s = parseInt(hsl[2]) / 100;
+  const l = parseInt(hsl[3]) / 100;
 
-  // Simplified HSP calculation for HSL
-  const r = l + s * Math.min(l, 1 - l) * Math.cos((h - 0) / 30);
-  const g = l + s * Math.min(l, 1 - l) * Math.cos((h - 120) / 30);
-  const b = l + s * Math.min(l, 1 - l) * Math.cos((h - 240) / 30);
-
+  const {r, g, b} = hslToRgb(h, s, l);
   const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
 
-  return hsp <= 0.5;
+  return hsp <= 127.5;
+};
+
+const hslToRgb = (h: number, s: number, l: number): { r: number; g: number; b: number } => {
+  // chroma
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const hPrime = h / 60;
+  // intermediate value
+  const x = c * (1 - Math.abs(hPrime % 2 - 1));
+  // match lightness
+  const m = l - c / 2;
+
+  let r: number = 0,
+      g: number = 0,
+      b: number = 0;
+  if (hPrime <= 1) {
+    r = c;
+    g = x;
+  }
+  else if (hPrime <= 2) {
+    r = x;
+    g = c;
+  }
+  else if (hPrime <= 3) {
+    g = c;
+    b = x;
+  }
+  else if (hPrime <= 4) {
+    g = x;
+    b = c;
+  }
+  else if (hPrime <= 5) {
+    r = x;
+    b = c;
+  }
+  else if (hPrime <= 6) {
+    r = c;
+    b = x;
+  }
+
+  r = Math.round((r + m) * 255);
+  g = Math.round((g + m) * 255);
+  b = Math.round((b + m) * 255);
+
+  return { r, g, b };
 };

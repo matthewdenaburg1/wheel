@@ -15,4 +15,11 @@
     border-radius: 50%;
     overflow: hidden;
   }
+
+  .caption {
+    text-align: center;
+    margin-top: 1rem;
+    font-style: italic;
+    color: var(--text-color);
+  }
 }

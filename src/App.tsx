@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Header from './Header';
-import Controls from './Controls';
-import Wheel from './Wheel';
-import WinnerDisplay from './WinnerDisplay';
-import WheelCaption from './WheelCaption';
-import ForkMe from './ForkMe';
-import { useTheme } from '../utils/theme';
-import { loadNamesFromUrl, shareUrl } from '../utils/url';
+import Controls from './components/Controls';
+import Wheel from './components/Wheel';
+import WinnerDisplay from './components/WinnerDisplay';
+import { useTheme } from './utils/theme';
+import { loadNamesFromUrl } from './utils/url';
 import styles from './App.module.scss';
 
 export interface Person {
@@ -24,42 +21,25 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const namesFromUrl = loadNamesFromUrl();
+
     if (namesFromUrl.length > 0) {
       const newPeople = namesFromUrl.map((name) => ({
         id: nextId.current++,
         name,
         enabled: true,
       }));
+
       setPeople(newPeople);
-    } else {
+    }
+    else {
       setPeople([
         { id: nextId.current++, name: 'Person 1', enabled: true },
         { id: nextId.current++, name: 'Person 2', enabled: true },
         { id: nextId.current++, name: 'Person 3', enabled: true },
+        { id: nextId.current++, name: 'Person 4', enabled: true },
       ]);
     }
   }, []);
-
-  const handleAddName = (name: string) => {
-    const newPerson: Person = {
-      id: nextId.current++,
-      name,
-      enabled: true,
-    };
-    setPeople([...people, newPerson]);
-  };
-
-  const handleRemoveName = (idToRemove: number) => {
-    setPeople(people.filter((person) => person.id !== idToRemove));
-  };
-
-  const handleToggleEnabled = (idToToggle: number) => {
-    setPeople(
-      people.map((person) =>
-        person.id === idToToggle ? { ...person, enabled: !person.enabled } : person
-      )
-    );
-  };
 
   const handleSpin = () => {
     if (people.filter(p => p.enabled).length > 0 && !isSpinning) {
@@ -69,48 +49,55 @@ const App: React.FC = () => {
 
   const handleSpinEnd = (newWinner: Person) => {
     setWinner(newWinner);
+    setIsSpinning(false);
   };
 
   const handleCloseWinner = () => {
     if (winner) {
-      handleToggleEnabled(winner.id); // Disable the winner
+      // Disable the winner
+      setPeople(
+        people.map((person) =>
+          person.id === winner.id ? { ...person, enabled: false } : person
+        )
+      )
     }
-    setWinner(null);
-    setIsSpinning(false);
-  };
 
-  const handleShare = () => {
-    shareUrl(people.map(p => p.name));
+    setWinner(null);
   };
 
   return (
     <div className={`${styles.app} ${theme}`}>
-      <Header />
+      <div className={styles.header}>
+        <h1>Wheel of Names</h1>
+      </div>
       <div className={styles.content}>
         <Controls
           people={people}
-          onAddName={handleAddName}
-          onRemoveName={handleRemoveName}
-          onToggleEnabled={handleToggleEnabled}
-          onSpin={handleSpin}
-          onShare={handleShare}
+          setPeople={setPeople}
           onToggleTheme={toggleTheme}
         />
-        <div>
-          <Wheel
-            people={people}
-            onSpin={handleSpin}
-            onSpinEnd={handleSpinEnd}
-            isSpinning={isSpinning}
-          />
-          <WheelCaption />
-        </div>
+        <Wheel
+          people={people}
+          isSpinning={isSpinning}
+          onSpin={handleSpin}
+          onSpinEnd={handleSpinEnd}
+        />
       </div>
       <WinnerDisplay
         winner={winner}
         onClose={handleCloseWinner}
       />
-      <ForkMe />
+      <div className={styles.forkMe}>
+        <div className={styles.wrapper}>
+          <a
+            href="https://github.com/matthewdenaburg1/wheel"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Fork me on GitHub
+          </a>
+        </div>
+      </div>
     </div>
   );
 };

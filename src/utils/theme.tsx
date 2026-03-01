@@ -4,10 +4,11 @@ const DARK_THEME = 'dark-mode';
 const LIGHT_THEME = 'light-mode';
 
 export const useTheme = (): [string, () => void] => {
-  const [theme, setTheme] = useState(LIGHT_THEME);
+  const [theme, setTheme] = useState(DARK_THEME);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
+
     if (savedTheme) {
       setTheme(savedTheme);
     } else if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {

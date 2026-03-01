@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './WinnerDisplay.module.scss';
 import confetti from 'canvas-confetti';
-import { Person } from './App';
+import { Person } from '../App';
 
 interface WinnerDisplayProps {
   winner: Person | null;
