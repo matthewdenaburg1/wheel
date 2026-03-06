@@ -7,9 +7,7 @@ import { Person } from './App';
 interface ControlsProps {
   people: Person[];
   onAddName: (name: string) => void;
-  onRemoveName: (id: number) => void;
   onToggleEnabled: (id: number) => void;
-  onSpin: () => void;
   onShare: () => void;
   onToggleTheme: () => void;
 }
@@ -17,22 +15,13 @@ interface ControlsProps {
 const Controls: React.FC<ControlsProps> = ({
   people,
   onAddName,
-  onRemoveName,
   onToggleEnabled,
-  onSpin,
   onShare,
   onToggleTheme,
 }) => {
   return (
     <div className={styles.controls}>
       <div className={styles.menu}>
-        <button
-          onClick={onSpin}
-          className={styles.iconButton}
-          title="Spin"
-        >
-          <span className="fa fa-light fa-play"></span>
-        </button>
         <button
           onClick={onShare}
           className={styles.iconButton}
@@ -51,7 +40,7 @@ const Controls: React.FC<ControlsProps> = ({
       <NameInput onAddName={onAddName} />
       <NameList
         people={people}
-        onRemoveName={onRemoveName}
+        onRemoveName={() => {}}
         onToggleEnabled={onToggleEnabled}
       />
     </div>

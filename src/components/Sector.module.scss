@@ -14,13 +14,7 @@
     width: calc(50% - 2rem);
     left: calc(50% + 1rem);
     transform-origin: left;
-
-    &.dark {
-      color: #fff;
-    }
-    &.light {
-      color: #000;
-    }
+    color: var(--text-color);
   }
 
   &.disabled {

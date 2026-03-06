@@ -1,6 +1,5 @@
 import React from 'react';
 import styles from './Sector.module.scss';
-import { degreesToRadians } from '../utils/angle';
 import { getHslColor, isColorDark } from '../utils/color';
 
 interface SectorProps {
@@ -10,6 +9,10 @@ interface SectorProps {
   radius: number;
   disabled: boolean;
 }
+
+const degreesToRadians = (angle: number): number => {
+  return angle * (Math.PI / 180);
+};
 
 const Sector: React.FC<SectorProps> = ({ name, angle, startAngle, radius, disabled }) => {
   const backgroundColor = getHslColor(startAngle);
