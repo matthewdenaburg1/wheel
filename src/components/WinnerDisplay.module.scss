@@ -8,12 +8,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 100;
 
   .winnerBox {
     background-color: var(--winner-overlay);
     border: 4px double var(--border-color);
     padding: 2rem;
     text-align: center;
+    position: fixed;
+    top: 25vh;
+    left: 25vw;
+    width: 50vw;
 
     h3 {
       color: var(--h2-color);

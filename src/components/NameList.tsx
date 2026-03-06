@@ -47,6 +47,7 @@ const NameList: React.FC<NameListProps> = ({ people, setPeople }) => {
             <span className="fa fa-regular fa-edit"></span>
           </button> */}
           <button
+            className={styles.button}
             onClick={() => handleRemoveName(person.id)}
           >
             <span className="fa fa-regular fa-trash-can"></span>

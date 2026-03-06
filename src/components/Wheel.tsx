@@ -9,11 +9,12 @@ interface WheelProps {
   isSpinning: boolean;
   onSpin: () => void;
   onSpinEnd: (person: Person) => void;
+  resetTrigger: boolean;
 }
 
 const SPIN_DURATION = 1500; // in milliseconds
 
-const Wheel: React.FC<WheelProps> = ({ people, isSpinning , onSpin, onSpinEnd }) => {
+const Wheel: React.FC<WheelProps> = ({ people, isSpinning , onSpin, onSpinEnd, resetTrigger }) => {
   const [rotation, setRotation] = useState(0);
   const radius = 500; // TODO
   const enabledPeople = people.filter((p) => p.enabled);
@@ -25,7 +26,7 @@ const Wheel: React.FC<WheelProps> = ({ people, isSpinning , onSpin, onSpinEnd })
       const winnerIndex = Math.floor(Math.random() * enabledPeople.length); // TODO: this could be improved
 
       const winner = enabledPeople[winnerIndex];
-      const winnerAngle = winnerIndex * sectorAngle;
+      const winnerAngle = winnerIndex * sectorAngle + sectorAngle / 2;
       const randomRotations = Math.floor(Math.random() * 3 + 2) * 360;
 
       const finalRotation = randomRotations - winnerAngle + sectorAngle / 2;
@@ -37,6 +38,10 @@ const Wheel: React.FC<WheelProps> = ({ people, isSpinning , onSpin, onSpinEnd })
       }, SPIN_DURATION);
     }
   }, [isSpinning, enabledPeople, onSpinEnd, sectorAngle]);
+
+  useEffect(() => {
+    setRotation(0);
+  }, [resetTrigger]);
 
   const toRadians = (angle: number): number => {
     return angle * (Math.PI / 180);
@@ -100,6 +105,7 @@ const Wheel: React.FC<WheelProps> = ({ people, isSpinning , onSpin, onSpinEnd })
         className={styles.wheelContainer}
         onClick={onSpin}
       >
+        <div className={styles.pointer}></div>
         <div
           className={styles.wheel}
           style={{

@@ -16,29 +16,31 @@ const App: React.FC = () => {
   const [people, setPeople] = useState<Person[]>([]);
   const [winner, setWinner] = useState<Person | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [resetWheelTrigger, setResetWheelTrigger] = useState(false);
   const [theme, toggleTheme] = useTheme();
   const nextId = useRef(0);
 
   useEffect(() => {
     const namesFromUrl = loadNamesFromUrl();
+    let people = []
 
     if (namesFromUrl.length > 0) {
-      const newPeople = namesFromUrl.map((name) => ({
+      people = namesFromUrl.map((name) => ({
         id: nextId.current++,
         name,
         enabled: true,
       }));
-
-      setPeople(newPeople);
     }
     else {
-      setPeople([
-        { id: nextId.current++, name: 'Person 1', enabled: true },
-        { id: nextId.current++, name: 'Person 2', enabled: true },
-        { id: nextId.current++, name: 'Person 3', enabled: true },
-        { id: nextId.current++, name: 'Person 4', enabled: true },
-      ]);
+      people = Array.from({ length: 6 }, (_, i) => ({
+        id: nextId.current++,
+        name: `Person ${i + 1}`,
+        enabled: true,
+      }));
     }
+
+    people.sort(() => Math.random() - 0.5);
+    setPeople(people);
   }, []);
 
   const handleSpin = () => {
@@ -63,6 +65,7 @@ const App: React.FC = () => {
     }
 
     setWinner(null);
+    setResetWheelTrigger(!resetWheelTrigger);
   };
 
   return (
@@ -81,6 +84,7 @@ const App: React.FC = () => {
           isSpinning={isSpinning}
           onSpin={handleSpin}
           onSpinEnd={handleSpinEnd}
+          resetTrigger={resetWheelTrigger}
         />
       </div>
       <WinnerDisplay

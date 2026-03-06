@@ -16,6 +16,19 @@
     overflow: hidden;
   }
 
+  .pointer {
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-right: 15px solid var(--strong-color);
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    z-index: 10;
+  }
+
   .caption {
     text-align: center;
     margin-top: 1rem;
