@@ -1,0 +1,22 @@
+.controls {
+  width: 15rem;
+  max-width: 15rem;
+
+  .menu {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+
+    .iconButton {
+      background: none;
+      border: none;
+      color: var(--icon-color);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0 0.5rem;
+
+      &:hover {
+        filter: var(--icon-shift);
+      }
+    }
+  }
+}
