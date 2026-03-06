@@ -5,37 +5,8 @@
     <title>Wheel of Names</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
-  <body class="dark-mode">
-    <div class="header">
-      <h1>Wheel of Names</h1>
-    </div>
-
-    <div id="content">
-      <div class="controls">
-        <div class="list menu" id="menu">
-          <div class="row">
-            <div class="item">
-              <span class="icon hover fa fa-regular fa-square-plus" id="new-name" title="Add name"></span>
-              <span class="icon hover fa fa-share" id="share" title="Share"></span>
-              <span class="icon hover fa fa-lightbulb" id="theme-toggle" title="Toggle theme"></span>
-            </div>
-          </div>
-        </div>
-        <div class="list people" id="people-list"></div>
-      </div>
-      <div class="wheel">
-        <div id="wheel-container"></div>
-      </div>
-    </div>
-    <div id="fork-me">
-      <div class="wrapper"><a href="https://github.com/matthewdenaburg1/wheel" target="_blank">Fork me on GitHub</a></div>
-    </div>
-    <div id="winner-overlay" class="hidden">
-      <div class="winner-box">
-        <h3>Next up is...</h3>
-        <h1 id="winner-name"></h1>
-      </div>
-    </div>
-    <script type="module" src="/main.ts"></script>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/main.tsx"></script>
   </body>
 </html>

@@ -1,0 +1,29 @@
+.winnerOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .winnerBox {
+    background-color: var(--winner-overlay);
+    border: 4px double var(--border-color);
+    padding: 2rem;
+    text-align: center;
+
+    h3 {
+      color: var(--h2-color);
+      margin: 0 0 1rem;
+    }
+
+    h1 {
+      color: var(--h1-color);
+      font-size: 3rem;
+      margin: 0;
+    }
+  }
+}
