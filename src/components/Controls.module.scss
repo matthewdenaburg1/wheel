@@ -1,0 +1,59 @@
+.controls {
+  justify-self: end;
+
+  width: 15rem;
+  max-width: 15rem;
+
+  .menu {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+
+    .iconButton {
+      background: none;
+      border: none;
+      color: var(--icon-color);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0 0.5rem;
+
+      &:hover {
+        filter: var(--icon-shift);
+      }
+    }
+  }
+
+  .nameInputForm {
+    display: flex;
+    margin-bottom: 1rem;
+
+    .nameInput {
+      flex-grow: 1;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--textarea-background-color);
+      color: var(--text-color);
+
+      &::placeholder {
+        color: var(--code-text-color);
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .addButton {
+      background: none;
+      border: none;
+      color: var(--icon-color);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0 0.5rem;
+
+      &:hover {
+        filter: var(--icon-shift);
+      }
+    }
+  }
+}

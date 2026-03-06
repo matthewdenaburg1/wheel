@@ -1,0 +1,30 @@
+.slice {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+
+  .name {
+    display: block;
+    align-content: center;
+    text-align: right;
+    position: relative;
+    // make sure the name stays visible inside the circle
+    width: calc(50% - 2rem);
+    left: 50%;
+    transform-origin: left;
+
+    &.dark {
+      color: #fff;
+    }
+    &.light {
+      color: #000;
+    }
+  }
+
+  &.disabled {
+    filter: grayscale(100%);
+    opacity: 0.5;
+  }
+}
