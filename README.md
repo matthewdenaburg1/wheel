@@ -17,7 +17,7 @@
 - [x] load from URL
 - [x] selected name is removed from wheel and wheel redraws itself
 - [x] names can be entered in text box if not provided from URL
-- [ ] names can be enabled/disabled with checkboxes for temp skipping
+- [x] names can be enabled/disabled with checkboxes for temp skipping
 - [ ] allow a "first spin is daily scrum leader" option
 
 ## Credits
