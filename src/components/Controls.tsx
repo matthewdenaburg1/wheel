@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import NameList from './NameList';
 import styles from './Controls.module.scss';
 import { shareUrl } from '../utils/url';
@@ -16,7 +16,17 @@ const Controls: React.FC<ControlsProps> = ({
   onToggleTheme,
 }) => {
   const [name, setName] = useState('');
+  const [isImportMode, setIsImportMode] = useState(false);
+  const [importValue, setImportValue] = useState('');
   const nextId = useRef(0);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (isImportMode && textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [importValue, isImportMode]);
 
   const handleAddName = (name: string) => {
     const newPerson: Person = {
@@ -35,9 +45,28 @@ const Controls: React.FC<ControlsProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (name.trim()) {
-      handleAddName(name.trim());
-      setName('');
+    if (isImportMode) {
+      const names = importValue
+        .split('\n')
+        .map((n) => n.trim())
+        .filter((n) => n.length > 0);
+
+      if (names.length > 0) {
+        nextId.current = 0;
+        const newPeople = names.map((name) => ({
+          id: nextId.current++,
+          name,
+          enabled: true,
+        }));
+        setPeople(newPeople);
+        setImportValue('');
+        setIsImportMode(false);
+      }
+    } else {
+      if (name.trim()) {
+        handleAddName(name.trim());
+        setName('');
+      }
     }
   };
 
@@ -58,20 +87,38 @@ const Controls: React.FC<ControlsProps> = ({
         >
           <span className="fa fa-lightbulb"></span>
         </button>
+        <button
+          onClick={() => setIsImportMode(!isImportMode)}
+          className={styles.iconButton}
+          title="Import"
+        >
+          <span className="fa fa-file-import"></span>
+        </button>
       </div>
 
       {/* name input form */}
       <form
-        className={styles.nameInputForm}
+        className={`${styles.nameInputForm} ${isImportMode ? styles.importMode : ''}`}
         onSubmit={handleSubmit}
       >
-        <input
-          type="text"
-          className={styles.nameInput}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter a name"
-        />
+        {isImportMode ? (
+          <textarea
+            ref={textareaRef}
+            className={styles.nameInput}
+            value={importValue}
+            onChange={(e) => setImportValue(e.target.value)}
+            placeholder="Enter names, one per line"
+            rows={1}
+          />
+        ) : (
+          <input
+            type="text"
+            className={styles.nameInput}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter a name"
+          />
+        )}
         <button
           type="submit"
           className={styles.addButton}
@@ -81,10 +128,12 @@ const Controls: React.FC<ControlsProps> = ({
         </button>
       </form>
 
-      <NameList
-        people={people}
-        setPeople={setPeople}
-      />
+      {!isImportMode && (
+        <NameList
+          people={people}
+          setPeople={setPeople}
+        />
+      )}
     </div>
   );
 };
