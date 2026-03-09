@@ -19,11 +19,16 @@
       &:hover {
         filter: var(--icon-shift);
       }
+
+      &.active {
+        color: var(--accent-color);
+      }
     }
   }
 
   .nameInputForm {
     display: flex;
+    align-items: flex-start;
     margin-bottom: 1rem;
 
     .nameInput {
@@ -33,6 +38,8 @@
       border: 1px solid var(--border-color);
       background-color: var(--textarea-background-color);
       color: var(--text-color);
+      resize: none;
+      overflow: hidden;
 
       &::placeholder {
         color: var(--code-text-color);
@@ -49,7 +56,9 @@
       color: var(--icon-color);
       font-size: 1.5rem;
       cursor: pointer;
-      padding: 0 0.5rem;
+      padding: 0.5rem 0.5rem;
+      display: flex;
+      align-items: center;
 
       &:hover {
         filter: var(--icon-shift);
