@@ -26,6 +26,10 @@
     display: flex;
     margin-bottom: 1rem;
 
+    &.importMode {
+      align-items: flex-start;
+    }
+
     .nameInput {
       flex-grow: 1;
       padding: 0.5rem;
@@ -33,6 +37,10 @@
       border: 1px solid var(--border-color);
       background-color: var(--textarea-background-color);
       color: var(--text-color);
+      resize: none;
+      max-height: 500px;
+      overflow-y: auto;
+      font-family: inherit;
 
       &::placeholder {
         color: var(--code-text-color);
