@@ -15,7 +15,7 @@ const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, onClose }) => {
 
   // Trigger confetti when the component renders with a winner
   confetti({
-    particleCount: 100,
+    particleCount: 75,
     spread: 70,
     origin: { y: 0.6 },
   });
