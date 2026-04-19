@@ -7,16 +7,17 @@ import { usePeople } from '../context/PeopleContext';
 interface WheelProps {
   isSpinning: boolean;
   radius: number;
-  resetTrigger: boolean;
   onSpin: () => void;
   onSpinEnd: (person: Person) => void;
+  resetTrigger: boolean;
+  spinDuration: number; // in seconds
 }
 
-const SPIN_DURATION = 1500; // in milliseconds
-
-const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, resetTrigger }) => {
+const Wheel: React.FC<WheelProps> = ({ radius, isSpinning, onSpin, onSpinEnd, resetTrigger, spinDuration }) => {
   const { people } = usePeople();
   const [rotation, setRotation] = useState(0);
+
+  const spinDurationMs = spinDuration * 1000;
   const enabledPeople = people.filter((p) => p.enabled);
 
   const syncSectorAngle = () => {
@@ -36,7 +37,8 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
 
       const winner = enabledPeople[winnerIndex];
       const winnerAngle = winnerIndex * sectorAngle + sectorAngle / 2;
-      const randomRotations = Math.floor(Math.random() * 3 + 2) * 360;
+      const baseRotations = 2 + Math.floor(spinDuration / 2) + Math.floor(Math.random() * 3);
+      const randomRotations = baseRotations * 360;
 
       const finalRotation = randomRotations - winnerAngle + sectorAngle / 2;
 
@@ -44,9 +46,9 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
 
       setTimeout(() => {
         onSpinEnd(winner);
-      }, SPIN_DURATION);
+      }, spinDurationMs);
     }
-  }, [isSpinning, enabledPeople, onSpinEnd, sectorAngle]);
+  }, [isSpinning, enabledPeople, onSpinEnd, sectorAngle, spinDurationMs]);
 
   useEffect(() => {
     setRotation(0);
@@ -63,7 +65,7 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
           className={styles.wheel}
           style={{
             transform: `rotate(${rotation}deg)`,
-            transition: isSpinning ? `transform ${SPIN_DURATION / 1000}s ease-out` : 'none',
+            transition: isSpinning ? `transform ${spinDuration}s linear(0, 0.75 60%, 0.859 70%, 0.9375 80%, 0.984 90%, 1)` : 'none',
           }}
         >
           {
