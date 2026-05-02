@@ -1,20 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import NameList from './NameList';
 import styles from './Controls.module.scss';
+import { usePeople } from '../context/PeopleContext';
 import { shareUrl } from '../utils/url';
-import { Person } from '../App';
 
 interface ControlsProps {
-  people: Person[];
-  setPeople: React.Dispatch<React.SetStateAction<Person[]>>;
   onToggleTheme: () => void;
 }
 
 const Controls: React.FC<ControlsProps> = ({
-  people,
-  setPeople,
   onToggleTheme,
 }) => {
+  const { people, setPeople } = usePeople();
   const [name, setName] = useState('');
   const [isImportMode, setIsImportMode] = useState(false);
   const [importValue, setImportValue] = useState('');
@@ -129,10 +126,7 @@ const Controls: React.FC<ControlsProps> = ({
       </form>
 
       {!isImportMode && (
-        <NameList
-          people={people}
-          setPeople={setPeople}
-        />
+        <NameList />
       )}
     </div>
   );

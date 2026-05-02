@@ -1,13 +1,10 @@
 import React from 'react';
 import styles from './NameList.module.scss';
-import { Person } from '../App';
+import { usePeople } from '../context/PeopleContext';
 
-interface NameListProps {
-  people: Person[];
-  setPeople: React.Dispatch<React.SetStateAction<Person[]>>;
-}
+const NameList: React.FC = () => {
+  const { people, setPeople } = usePeople();
 
-const NameList: React.FC<NameListProps> = ({ people, setPeople }) => {
   const handleRemoveName = (id: number) => {
     const person = people.find((person) => person.id === id);
 

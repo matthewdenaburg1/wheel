@@ -3,7 +3,7 @@
  * @param angle The angle for the hue.
  * @returns An HSL color string.
  */
-export const getHslColor = (angle: number): string => {
+export const hslColorString = (angle: number): string => {
   return `hsl(${Math.floor(angle)}, 100%, 45%)`;
 };
 
@@ -13,7 +13,7 @@ export const getHslColor = (angle: number): string => {
  * @returns True if the color is dark, false otherwise.
  * @see https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB
  */
-export const isColorDark = (hslColor: string): boolean => {
+export const isDarkColor = (hslColor: string): boolean => {
   const hsl = hslColor.match(/^hsl\((\d+),\s*(\d+)%,\s*(\d+)%/);
   if (!hsl) {
     return false; // Default to not dark if parsing fails
