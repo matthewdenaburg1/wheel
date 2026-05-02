@@ -1,19 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Controls from './components/Controls';
 import Wheel from './components/Wheel';
 import WinnerDisplay from './components/WinnerDisplay';
+
+import { PeopleContext, usePeopleState } from './context/PeopleContext';
+
 import { useTheme } from './utils/theme';
 import { loadNamesFromUrl } from './utils/url';
+
 import styles from './App.module.scss';
 
-export interface Person {
-  id: number;
-  name: string;
-  enabled: boolean;
-}
-
 const App: React.FC = () => {
-  const [people, setPeople] = useState<Person[]>([]);
+  const [people, setPeople] = usePeopleState();
   const [winner, setWinner] = useState<Person | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [resetWheelTrigger, setResetWheelTrigger] = useState(false);
@@ -21,23 +19,18 @@ const App: React.FC = () => {
   const nextId = useRef(0);
 
   useEffect(() => {
-    const namesFromUrl = loadNamesFromUrl();
-    let people = []
-
-    if (namesFromUrl.length > 0) {
-      people = namesFromUrl.map((name) => ({
-        id: nextId.current++,
-        name,
-        enabled: true,
-      }));
-    }
-    else {
-      people = Array.from({ length: 6 }, (_, i) => ({
-        id: nextId.current++,
-        name: `Person ${i + 1}`,
-        enabled: true,
-      }));
-    }
+    const namesFromUrl = loadNamesFromUrl().sort(() => Math.random() - 0.5);
+    let people = namesFromUrl.length > 0
+      ? namesFromUrl.map((name) => ({
+          id: nextId.current++,
+          name,
+          enabled: true,
+        }))
+      : Array.from({ length: 6 }, (_, i) => ({
+          id: nextId.current++,
+          name: `Person ${i + 1}`,
+          enabled: true,
+        }));
 
     people.sort(() => Math.random() - 0.5);
     setPeople(people);
@@ -74,18 +67,18 @@ const App: React.FC = () => {
         <h1>Wheel of Names</h1>
       </div>
       <div className={styles.content}>
-        <Controls
-          people={people}
-          setPeople={setPeople}
-          onToggleTheme={toggleTheme}
-        />
-        <Wheel
-          people={people}
-          isSpinning={isSpinning}
-          onSpin={handleSpin}
-          onSpinEnd={handleSpinEnd}
-          resetTrigger={resetWheelTrigger}
-        />
+        <PeopleContext.Provider value={{ people, setPeople }}>
+          <Controls
+            onToggleTheme={toggleTheme}
+          />
+          <Wheel
+            isSpinning={isSpinning}
+            radius={500}
+            onSpin={handleSpin}
+            onSpinEnd={handleSpinEnd}
+            resetTrigger={resetWheelTrigger}
+          />
+        </PeopleContext.Provider>
       </div>
       <WinnerDisplay
         winner={winner}

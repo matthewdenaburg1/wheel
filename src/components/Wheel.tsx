@@ -1,25 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import Sector from './Sector';
 import styles from './Wheel.module.scss';
-import { Person } from '../App';
-import { getHslColor } from '../utils/color';
+
+import { usePeople } from '../context/PeopleContext';
 
 interface WheelProps {
-  people: Person[];
   isSpinning: boolean;
+  radius: number;
+  resetTrigger: boolean;
   onSpin: () => void;
   onSpinEnd: (person: Person) => void;
-  resetTrigger: boolean;
 }
 
 const SPIN_DURATION = 1500; // in milliseconds
 
-const Wheel: React.FC<WheelProps> = ({ people, isSpinning , onSpin, onSpinEnd, resetTrigger }) => {
+const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, resetTrigger }) => {
+  const { people } = usePeople();
   const [rotation, setRotation] = useState(0);
-  const radius = 500; // TODO
   const enabledPeople = people.filter((p) => p.enabled);
 
-  const sectorAngle = enabledPeople.length <= 1 ? 359.999 : 360 / enabledPeople.length;
+  const syncSectorAngle = () => {
+    const length = enabledPeople.length;
+    return length <= 1 ? 359.999 : 360 / Math.floor(length);
+  }
+
+  useEffect(() => {
+    setSectorAngle(syncSectorAngle());
+  }, [enabledPeople.length]);
+
+  const [sectorAngle, setSectorAngle] = useState(syncSectorAngle());
 
   useEffect(() => {
     if (isSpinning) {
@@ -43,62 +52,6 @@ const Wheel: React.FC<WheelProps> = ({ people, isSpinning , onSpin, onSpinEnd, r
     setRotation(0);
   }, [resetTrigger]);
 
-  const toRadians = (angle: number): number => {
-    return angle * (Math.PI / 180);
-  };
-
-  const vectorAngleToPoint = (angle: number): { x: number; y: number } => {
-    const angleRadians = toRadians(angle);
-    let x = radius + radius * Math.cos(angleRadians);
-    let y = radius + radius * Math.sin(angleRadians);
-
-    // divide by 2 since we're starting from the center
-    x /= 2;
-    y /= 2;
-
-    // to 3 decimal places
-    x = Math.round(x * 1000) / 1000;
-    y = Math.round(y * 1000) / 1000;
-
-    return { x, y };
-  };
-
-  const pointToPathString = (point: { x: number; y: number }): string => {
-    return `${point.x} ${point.y}`
-  };
-
-  const createSector = (index: number): {
-    color: string;
-    path: string;
-    chord: number;
-  } => {
-    const center = pointToPathString({ x: radius / 2, y: radius / 2 });
-    const arcStartPoint = vectorAngleToPoint(0);
-    const arcEndPoint = vectorAngleToPoint(sectorAngle);
-    const largeArcFlag = sectorAngle > 180 ? 1 : 0;
-
-    const arc = [
-      center,
-      0, // always start at 0
-      largeArcFlag,
-      1,
-      pointToPathString(arcEndPoint)
-    ].join(' ');
-
-    const path = [
-      `M ${center}`,
-      `L ${pointToPathString(arcStartPoint)}`,
-      `A ${arc}`,
-      'Z',
-    ].join(' ');
-
-    return {
-      color: getHslColor(Math.floor(index * sectorAngle)),
-      path: path,
-      chord: enabledPeople.length === 1 ? radius : Math.sin(toRadians(sectorAngle) / 2),
-    }
-  };
-
   return (
     <div>
       <div
@@ -118,8 +71,8 @@ const Wheel: React.FC<WheelProps> = ({ people, isSpinning , onSpin, onSpinEnd, r
               return <Sector
                 key={person.id}
                 name={person.name}
-                sectorData={createSector(index)}
                 index={index}
+                radius={radius}
                 sectorAngle={sectorAngle}
               />;
             })
