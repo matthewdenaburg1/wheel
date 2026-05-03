@@ -33,12 +33,12 @@ const SettingsPopover = forwardRef<HTMLDivElement, SettingsPopoverProps>(functio
   onShuffle,
   spinDuration,
   setSpinDuration,
-  soundEnabled,
-  setSoundEnabled,
+  // soundEnabled,
+  // setSoundEnabled,
   onImportSubmit,
   importValue,
   setImportValue,
-  onClose,
+  // onClose,
 }, ref) {
   const importTextareaRef = useRef<HTMLTextAreaElement>(null);
 

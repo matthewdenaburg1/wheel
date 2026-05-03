@@ -178,7 +178,7 @@ const Controls: React.FC<ControlsProps> = ({
           <button
             ref={gearButtonRef}
             onClick={toggleSettings}
-            className={`${styles.iconButton}${isSettingsOpen ? ` ${styles.active}` : ''}`}
+            className={`${styles.settingsButton} ${styles.iconButton}${isSettingsOpen ? ` ${styles.active}` : ''}`}
             title="Settings"
           >
             <span className="fa fa-gear"></span>

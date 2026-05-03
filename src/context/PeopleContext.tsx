@@ -7,7 +7,7 @@ interface PeopleContextValue {
   setPeople: Dispatch<SetStateAction<People>>;
 }
 
-const PeopleContext = createContext<PeopleContextValue>({
+export const PeopleContext = createContext<PeopleContextValue>({
   people: [],
   setPeople: () => {},
 });
@@ -16,5 +16,3 @@ export const usePeople = () => useContext(PeopleContext);
 export const usePeopleState = (): [People, Dispatch<SetStateAction<People>>] => {
   return useState<People>([]);
 };
-
-export { PeopleContext };
