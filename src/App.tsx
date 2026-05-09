@@ -3,6 +3,7 @@ import Controls from './components/Controls';
 import Wheel from './components/Wheel';
 import WinnerDisplay from './components/WinnerDisplay';
 
+import { SettingsContext, useSettingsState } from './context/SettingsContext';
 import { PeopleContext, usePeopleState } from './context/PeopleContext';
 
 import { useTheme } from './utils/theme';
@@ -14,6 +15,8 @@ const initialUrlParams = parseUrlParams();
 
 const App: React.FC = () => {
   const [people, setPeople] = usePeopleState();
+  const [settings] = useSettingsState();
+
   const [winner, setWinner] = useState<Person | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [resetWheelTrigger, setResetWheelTrigger] = useState(false);
@@ -70,52 +73,50 @@ const App: React.FC = () => {
     setResetWheelTrigger(!resetWheelTrigger);
   };
 
-  const handleShuffle = () => {
-    setPeople((prev) => [...prev].sort(() => Math.random() - 0.5));
-  };
-
   return (
-    <div className={`${styles.app} ${theme}`}>
-      <div className={styles.header}>
-        <h1>Wheel of Names</h1>
-      </div>
-      <div className={styles.content}>
-        <PeopleContext.Provider value={{ people, setPeople }}>
-          <Controls
-            onToggleTheme={toggleTheme}
-            theme={theme}
-            spinDuration={spinDuration}
-            setSpinDuration={setSpinDuration}
-            soundEnabled={soundEnabled}
-            setSoundEnabled={setSoundEnabled}
-            onShuffle={handleShuffle}
+    <SettingsContext.Provider value={{ ...settings }}>
+      <div className={`${styles.app} ${theme}`}>
+        <div className={styles.header}>
+          <h1>Wheel of Names</h1>
+        </div>
+        <div className={styles.content}>
+          <PeopleContext.Provider value={{ people, setPeople }}>
+            <Controls
+              // theme={theme}
+              // spinDuration={spinDuration}
+              // soundEnabled={soundEnabled}
+              // onToggleTheme={toggleTheme}
+              // setSpinDuration={setSpinDuration}
+              // setSoundEnabled={setSoundEnabled}
+              // onShuffle={handleShuffle}
+            />
+            <Wheel
+              isSpinning={isSpinning}
+              radius={500}
+              onSpin={handleSpin}
+              onSpinEnd={handleSpinEnd}
+              resetTrigger={resetWheelTrigger}
+              spinDuration={spinDuration}
           />
-          <Wheel
-            isSpinning={isSpinning}
-            radius={500}
-            onSpin={handleSpin}
-            onSpinEnd={handleSpinEnd}
-            resetTrigger={resetWheelTrigger}
-            spinDuration={spinDuration}
+          </PeopleContext.Provider>
+        </div>
+        <WinnerDisplay
+          winner={winner}
+          onClose={handleCloseWinner}
         />
-        </PeopleContext.Provider>
-      </div>
-      <WinnerDisplay
-        winner={winner}
-        onClose={handleCloseWinner}
-      />
-      <div className={styles.forkMe}>
-        <div className={styles.wrapper}>
-          <a
-            href="https://github.com/matthewdenaburg1/wheel"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Fork me on GitHub
-          </a>
+        <div className={styles.forkMe}>
+          <div className={styles.wrapper}>
+            <a
+              href="https://github.com/matthewdenaburg1/wheel"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Fork me on GitHub
+            </a>
+          </div>
         </div>
       </div>
-    </div>
+    </SettingsContext.Provider>
   );
 };
 

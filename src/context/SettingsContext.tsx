@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, Dispatch, SetStateAction } from 'react';
 import { useTheme } from '../utils/theme';
+import { DEFAULT_SPIN_DURATION } from '../constants';
 
 interface SettingsContextValue {
   radius?: number;
@@ -15,9 +16,12 @@ interface SettingsContextValue {
 }
 
 const settings: SettingsContextValue = {
+  radius: 500,
+  setRadius: () => {},
+
   theme: useTheme,
 
-  spinDuration: 1,
+  spinDuration: DEFAULT_SPIN_DURATION,
   setSpinDuration: () => {},
 
   soundEnabled: false,
@@ -25,7 +29,7 @@ const settings: SettingsContextValue = {
 }
 
 export const SettingsContext = createContext<SettingsContextValue>(settings);
-export const usePeople = () => useContext(SettingsContext);
-export const usePeopleState = (): [SettingsContextValue, Dispatch<SetStateAction<SettingsContextValue>>] => {
+export const useSettings = () => useContext(SettingsContext);
+export const useSettingsState = (): [SettingsContextValue, Dispatch<SetStateAction<SettingsContextValue>>] => {
   return useState<SettingsContextValue>(settings);
 };
