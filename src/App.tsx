@@ -6,22 +6,25 @@ import WinnerDisplay from './components/WinnerDisplay';
 import { PeopleContext, usePeopleState } from './context/PeopleContext';
 
 import { useTheme } from './utils/theme';
-import { loadNamesFromUrl } from './utils/url';
+import { parseUrlParams } from './utils/url';
 
 import styles from './App.module.scss';
 
 const App: React.FC = () => {
+  const initialParameters = parseUrlParams();
+
   const [people, setPeople] = usePeopleState();
+  const nextId = useRef(0);
+
   const [winner, setWinner] = useState<Person | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [resetWheelTrigger, setResetWheelTrigger] = useState(false);
-  const [theme, toggleTheme] = useTheme();
-  const nextId = useRef(0);
+  const themeControls = useTheme(initialParameters.theme);
 
   useEffect(() => {
-    const namesFromUrl = loadNamesFromUrl().sort(() => Math.random() - 0.5);
-    let people = namesFromUrl.length > 0
-      ? namesFromUrl.map((name) => ({
+    const names = initialParameters.names;
+    let people = names.length > 0
+      ? names.map((name) => ({
           id: nextId.current++,
           name,
           enabled: true,
@@ -62,14 +65,14 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`${styles.app} ${theme}`}>
+    <div className={`${styles.app} ${themeControls.theme}`}>
       <div className={styles.header}>
         <h1>Wheel of Names</h1>
       </div>
       <div className={styles.content}>
         <PeopleContext.Provider value={{ people, setPeople }}>
           <Controls
-            onToggleTheme={toggleTheme}
+            themeControls={themeControls}
           />
           <Wheel
             isSpinning={isSpinning}

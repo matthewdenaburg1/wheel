@@ -11,14 +11,15 @@
     text-align: right;
     position: relative;
     // make sure the name stays visible inside the circle
+    top: calc(50% - 0.5em);
     width: calc(50% - 2rem);
     left: 50%;
     transform-origin: left;
 
-    &.dark {
+    &.isDark {
       color: #fff;
     }
-    &.light {
+    &.isLight {
       color: #000;
     }
   }
