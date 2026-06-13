@@ -23,7 +23,13 @@ export function toTheme(value: string | null): Theme {
   }
 }
 
-export const useTheme = (initialTheme: Theme | null = null): [Theme, () => void] => {
+export interface ThemeControls {
+  theme: Theme;
+  toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
+}
+
+export const useTheme = (initialTheme: Theme | null = null): ThemeControls => {
   const [theme, setTheme] = useState(initialTheme ?? 'dark');
 
   useEffect(() => {
@@ -51,5 +57,5 @@ export const useTheme = (initialTheme: Theme | null = null): [Theme, () => void]
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light' ));
   };
 
-  return [theme, toggleTheme];
+  return {theme, toggleTheme, setTheme};
 };

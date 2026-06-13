@@ -51,18 +51,18 @@ export const parseUrlParams = (): UrlParams => {
  */
 export const copyShareUrl = (
   names: string[],
-  theme: string,
-  spinDuration: number,
-  soundEnabled: boolean,
+  theme: Theme = 'dark',
+  spinDuration: number = DEFAULT_SPIN_DURATION,
+  // soundEnabled?: boolean,
 ): void => {
   const url = new URL(window.location.href);
   url.search = '';
   url.searchParams.set('names', names.join(','));
-  url.searchParams.set('theme', theme === 'light-mode' ? 'light' : 'dark');
+  url.searchParams.set('theme', theme);
   url.searchParams.set('spin-for', String(spinDuration));
-  if (soundEnabled) {
-    url.searchParams.set('sound', 'on');
-  }
+  // if (soundEnabled || soundEnabled === undefined) {
+  //   url.searchParams.set('sound', 'on');
+  // }
 
   // Decode for human-readable commas in the URL
   navigator.clipboard.writeText(decodeURIComponent(url.href)).then(
