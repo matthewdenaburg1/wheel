@@ -2,14 +2,15 @@ import React, { useState, useRef, useEffect } from 'react';
 import NameList from './NameList';
 import styles from './Controls.module.scss';
 import { usePeople } from '../context/PeopleContext';
-import { shareUrl } from '../utils/url';
+import { copyShareUrl } from '../utils/url';
+import { ThemeControls } from '../utils/theme';
 
 interface ControlsProps {
-  onToggleTheme: () => void;
+  themeControls: ThemeControls;
 }
 
 const Controls: React.FC<ControlsProps> = ({
-  onToggleTheme,
+  themeControls,
 }) => {
   const { people, setPeople } = usePeople();
   const [name, setName] = useState('');
@@ -36,7 +37,7 @@ const Controls: React.FC<ControlsProps> = ({
   };
 
   const handleShare = () => {
-    shareUrl(people.map(p => p.name));
+    copyShareUrl(people.map(p => p.name), themeControls.theme);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -78,7 +79,7 @@ const Controls: React.FC<ControlsProps> = ({
           <span className="fa fa-share"></span>
         </button>
         <button
-          onClick={onToggleTheme}
+          onClick={themeControls.toggleTheme}
           className={styles.iconButton}
           title="Toggle theme"
         >

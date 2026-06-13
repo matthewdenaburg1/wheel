@@ -82,13 +82,10 @@ const Sector: React.FC<SectorProps> = ({ name, index, radius, sectorAngle }) => 
     >
       {/* the name of the person, centered in the sector */}
       <div
-        className={`${styles.name} ${isDarkColor(color) ? styles.dark : styles.light}`}
+        className={`${styles.name} ${isDarkColor(color) ? styles.isDark : styles.isLight}`}
         style={{
-          top: `calc(50% - 0.5em)`,
-
           // counteract the rotation of the sector when it's added to the wheel by rotating back a little bit, so that the text is always horizontal
           transform: `rotate(${sectorAngle / 2}deg)`,
-          transformOrigin: 'left'
         }}
       >
         {name}

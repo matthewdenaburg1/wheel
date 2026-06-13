@@ -9,7 +9,7 @@ body {
   color: var(--text-color);
 }
 
-.light-mode {
+.light {
   --background-color: #fff;
   --textarea-background-color: #fff;
   --fork-me-background-color: #ddd;
@@ -27,7 +27,7 @@ body {
   --icon-shift: invert(0.5);
 }
 
-.dark-mode {
+.dark {
   --background-color: #222;
   --textarea-background-color: #444;
   --fork-me-background-color: #444;

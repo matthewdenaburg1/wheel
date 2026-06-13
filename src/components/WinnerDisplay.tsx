@@ -4,20 +4,33 @@ import confetti from 'canvas-confetti';
 
 interface WinnerDisplayProps {
   winner: Person | null;
+  confettiOverrides?: confetti.Options;
   onClose: () => void;
 }
 
-const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, onClose }) => {
+const showConfetti = (overrides: confetti.Options = {}) => {
+  const confettiShared = {
+    particleCount: 50,
+    spread: 50,
+    disableForReducedMotion: true,
+  };
+
+  const adjustments = {
+    right: { origin: { x: 0.8, y: 0.6 }, angle: 135, drift: -1 },
+    left:  { origin: { x: 0.2, y: 0.6 }, angle:  45, drift:  1 },
+  };
+
+  confetti({ ...confettiShared, ...adjustments.right, ...overrides, });
+  confetti({ ...confettiShared, ...adjustments.left, ...overrides, });
+};
+
+const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, onClose, confettiOverrides }) => {
   if (!winner) {
     return null;
   }
 
   // Trigger confetti when the component renders with a winner
-  confetti({
-    particleCount: 75,
-    spread: 70,
-    origin: { y: 0.6 },
-  });
+  showConfetti(confettiOverrides);
 
   return (
     <div
