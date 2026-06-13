@@ -6,31 +6,40 @@ import WinnerDisplay from './components/WinnerDisplay';
 import { PeopleContext, usePeopleState } from './context/PeopleContext';
 
 import { useTheme } from './utils/theme';
-import { loadNamesFromUrl } from './utils/url';
+import { parseUrlParams } from './utils/url';
 
 import styles from './App.module.scss';
+
+const initialUrlParams = parseUrlParams();
 
 const App: React.FC = () => {
   const [people, setPeople] = usePeopleState();
   const [winner, setWinner] = useState<Person | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [resetWheelTrigger, setResetWheelTrigger] = useState(false);
-  const [theme, toggleTheme] = useTheme();
+  const [spinDuration, setSpinDuration] = useState(initialUrlParams.spinDuration);
+  const [soundEnabled, setSoundEnabled] = useState(initialUrlParams.soundEnabled);
+  const [theme, toggleTheme] = useTheme(initialUrlParams.theme);
   const nextId = useRef(0);
 
   useEffect(() => {
-    const namesFromUrl = loadNamesFromUrl().sort(() => Math.random() - 0.5);
-    let people = namesFromUrl.length > 0
-      ? namesFromUrl.map((name) => ({
-          id: nextId.current++,
-          name,
-          enabled: true,
-        }))
-      : Array.from({ length: 6 }, (_, i) => ({
-          id: nextId.current++,
-          name: `Person ${i + 1}`,
-          enabled: true,
-        }));
+    const { names: namesFromUrl } = initialUrlParams;
+    let people: Person[];
+
+    if (namesFromUrl.length > 0) {
+      people = namesFromUrl.map((name) => ({
+        id: nextId.current++,
+        name,
+        enabled: true,
+      }));
+    }
+    else {
+      people = Array.from({ length: 6 }, (_, i) => ({
+        id: nextId.current++,
+        name: `Person ${i + 1}`,
+        enabled: true,
+      }));
+    }
 
     people.sort(() => Math.random() - 0.5);
     setPeople(people);
@@ -61,6 +70,10 @@ const App: React.FC = () => {
     setResetWheelTrigger(!resetWheelTrigger);
   };
 
+  const handleShuffle = () => {
+    setPeople((prev) => [...prev].sort(() => Math.random() - 0.5));
+  };
+
   return (
     <div className={`${styles.app} ${theme}`}>
       <div className={styles.header}>
@@ -70,6 +83,12 @@ const App: React.FC = () => {
         <PeopleContext.Provider value={{ people, setPeople }}>
           <Controls
             onToggleTheme={toggleTheme}
+            theme={theme}
+            spinDuration={spinDuration}
+            setSpinDuration={setSpinDuration}
+            soundEnabled={soundEnabled}
+            setSoundEnabled={setSoundEnabled}
+            onShuffle={handleShuffle}
           />
           <Wheel
             isSpinning={isSpinning}
@@ -77,7 +96,8 @@ const App: React.FC = () => {
             onSpin={handleSpin}
             onSpinEnd={handleSpinEnd}
             resetTrigger={resetWheelTrigger}
-          />
+            spinDuration={spinDuration}
+        />
         </PeopleContext.Provider>
       </div>
       <WinnerDisplay
