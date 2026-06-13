@@ -44,6 +44,8 @@ const NameList: React.FC = () => {
             <span className="fa fa-regular fa-edit"></span>
           </button> */}
           <button
+            title="Remove"
+            type="button"
             className={styles.button}
             onClick={() => handleRemoveName(person.id)}
           >

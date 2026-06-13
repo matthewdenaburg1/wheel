@@ -1,18 +1,44 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-const DARK_THEME = 'dark-mode';
-const LIGHT_THEME = 'light-mode';
+export type Theme = 'dark' | 'light';
 
-export const useTheme = (): [string, () => void] => {
-  const [theme, setTheme] = useState(DARK_THEME);
+export function isTheme(value: string): value is Theme {
+  return ['light', 'dark', 'light-mode', 'dark-mode'].includes(value.toLowerCase());
+}
+
+export function toTheme(value: string | null): Theme {
+  if (value === null || !isTheme(value)) {
+    return 'dark';
+  }
+
+  switch (value?.toLowerCase()) {
+    case 'light':
+    case 'light-mode':
+      return 'light';
+    case 'dark':
+    case 'dark-mode':
+      return 'dark';
+    default:
+      return 'dark';
+  }
+}
+
+export const useTheme = (initialTheme: Theme | null = null): [Theme, () => void] => {
+  const [theme, setTheme] = useState(initialTheme ?? 'dark');
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
+    // When an initial theme is provided (e.g. from URL), use it directly
+    // and skip the localStorage / system-preference lookup.
+    if (initialTheme) {
+      return;
+    }
+
+    const savedTheme = toTheme(localStorage.getItem('theme'));
 
     if (savedTheme) {
       setTheme(savedTheme);
     } else if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
-      setTheme(DARK_THEME);
+      setTheme('dark');
     }
   }, []);
 
@@ -22,7 +48,7 @@ export const useTheme = (): [string, () => void] => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === LIGHT_THEME ? DARK_THEME : LIGHT_THEME));
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light' ));
   };
 
   return [theme, toggleTheme];
