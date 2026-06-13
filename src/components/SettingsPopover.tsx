@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './Controls.module.scss';
+import styles from './SettingsPopover.module.scss';
 
 interface PopoverPosition {
   top: number;
@@ -65,6 +65,7 @@ const SettingsPopover = forwardRef<HTMLDivElement, SettingsPopoverProps>(functio
         <button
           className={styles.iconButton}
           title="Toggle theme"
+          type="button"
           onClick={onToggleTheme}
         >
           <span className="fa fa-lightbulb"></span>
@@ -78,22 +79,25 @@ const SettingsPopover = forwardRef<HTMLDivElement, SettingsPopoverProps>(functio
           <span className={`fa fa-${soundEnabled ? 'microphone' : 'microphone-slash'}`}></span>
         </button> */}
         <button
-          className={styles.iconButton}
           title="Shuffle names"
+          className={styles.iconButton}
+          // type="button"
           onClick={onShuffle}
         >
           <span className="fa fa-shuffle"></span>
         </button>
         <button
-          className={`${styles.iconButton}${activePanel === 'spin' ? ` ${styles.active}` : ''}`}
           title="Spin duration"
+          className={`${styles.iconButton}${activePanel === 'spin' ? ` ${styles.active}` : ''}`}
+          // type="button"
           onClick={() => onTogglePanel('spin')}
         >
           <span className="fa fa-gauge-high"></span>
         </button>
         <button
-          className={`${styles.iconButton}${activePanel === 'import' ? ` ${styles.active}` : ''}`}
           title="Import names"
+          className={`${styles.iconButton}${activePanel === 'import' ? ` ${styles.active}` : ''}`}
+          // type="button"
           onClick={() => onTogglePanel('import')}
         >
           <span className="fa fa-file-import"></span>
@@ -125,6 +129,7 @@ const SettingsPopover = forwardRef<HTMLDivElement, SettingsPopoverProps>(functio
           <div className={styles.spinSlider}>
             <input
               type="range"
+              aria-label="Spin duration"
               min={1}
               max={20}
               value={spinDuration}
