@@ -1,21 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
+
+import Settings from './Settings';
 import NameList from './NameList';
-import styles from './Controls.module.scss';
+import styles from '../styles/components/Controls.module.scss';
+
 import { usePeople } from '../context/PeopleContext';
-import { copyShareUrl } from '../utils/url';
-import { ThemeControls } from '../utils/theme';
 
-interface ControlsProps {
-  themeControls: ThemeControls;
-}
-
-const Controls: React.FC<ControlsProps> = ({
-  themeControls,
-}) => {
+const Controls: React.FC = () => {
   const { people, setPeople } = usePeople();
-  const [name, setName] = useState('');
-  const [isImportMode, setIsImportMode] = useState(false);
-  const [importValue, setImportValue] = useState('');
+  const [isImportMode, setIsImportMode] = useState<boolean>(false);
+  const [importValue, setImportValue] = useState<string>('');
   const nextId = useRef(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -26,22 +20,8 @@ const Controls: React.FC<ControlsProps> = ({
     }
   }, [importValue, isImportMode]);
 
-  const handleAddName = (name: string) => {
-    const newPerson: Person = {
-      id: nextId.current++,
-      name,
-      enabled: true,
-    };
-
-    setPeople([...people, newPerson]);
-  };
-
-  const handleShare = () => {
-    copyShareUrl(people.map(p => p.name), themeControls.theme);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
     if (isImportMode) {
       const names = importValue
@@ -60,39 +40,18 @@ const Controls: React.FC<ControlsProps> = ({
         setImportValue('');
         setIsImportMode(false);
       }
-    } else {
-      if (name.trim()) {
-        handleAddName(name.trim());
-        setName('');
-      }
+    // } else { // TODO: ???
+    //   const name = importValue.trim();
+    //   if (name.trim()) {
+    //     handleAddName(name.trim());
+    //     setName('');
+    //   }
     }
   };
 
   return (
     <div className={styles.controls}>
-      <div className={styles.menu}>
-        <button
-          onClick={handleShare}
-          className={styles.iconButton}
-          title="Share"
-        >
-          <span className="fa fa-share"></span>
-        </button>
-        <button
-          onClick={themeControls.toggleTheme}
-          className={styles.iconButton}
-          title="Toggle theme"
-        >
-          <span className="fa fa-lightbulb"></span>
-        </button>
-        <button
-          onClick={() => setIsImportMode(!isImportMode)}
-          className={styles.iconButton}
-          title="Import"
-        >
-          <span className="fa fa-file-import"></span>
-        </button>
-      </div>
+      <Settings />
 
       {/* name input form */}
       <form
@@ -112,8 +71,8 @@ const Controls: React.FC<ControlsProps> = ({
           <input
             type="text"
             className={styles.nameInput}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            // value={name}
+            // onChange={(e) => setName(e.target.value)}
             placeholder="Enter a name"
           />
         )}
@@ -121,14 +80,13 @@ const Controls: React.FC<ControlsProps> = ({
           type="submit"
           className={styles.addButton}
           aria-label="Add"
+          title="Add"
         >
           <span className="fa fa-regular fa-square-plus"></span>
         </button>
       </form>
 
-      {!isImportMode && (
-        <NameList />
-      )}
+      <NameList />
     </div>
   );
 };

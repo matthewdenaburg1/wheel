@@ -3,9 +3,8 @@ import Controls from './components/Controls';
 import Wheel from './components/Wheel';
 import WinnerDisplay from './components/WinnerDisplay';
 
-import { PeopleContext, usePeopleState } from './context/PeopleContext';
+import { usePeople } from './context/PeopleContext';
 
-import { useTheme } from './utils/theme';
 import { parseUrlParams } from './utils/url';
 
 import styles from './App.module.scss';
@@ -13,16 +12,16 @@ import styles from './App.module.scss';
 const App: React.FC = () => {
   const initialParameters = parseUrlParams();
 
-  const [people, setPeople] = usePeopleState();
+  const peopleController = usePeople();
   const nextId = useRef(0);
 
   const [winner, setWinner] = useState<Person | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [resetWheelTrigger, setResetWheelTrigger] = useState(false);
-  const themeControls = useTheme(initialParameters.theme);
 
   useEffect(() => {
     const names = initialParameters.names;
+    people
     let people = names.length > 0
       ? names.map((name) => ({
           id: nextId.current++,
@@ -65,15 +64,13 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`${styles.app} ${themeControls.theme}`}>
+    <div className={`${styles.app}`}>
       <div className={styles.header}>
         <h1>Wheel of Names</h1>
       </div>
       <div className={styles.content}>
         <PeopleContext.Provider value={{ people, setPeople }}>
-          <Controls
-            themeControls={themeControls}
-          />
+          <Controls />
           <Wheel
             isSpinning={isSpinning}
             radius={500}

@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './WinnerDisplay.module.scss';
+import styles from '../styles/components/WinnerDisplay.module.scss';
 import confetti from 'canvas-confetti';
 
 interface WinnerDisplayProps {

@@ -1,34 +1,20 @@
 .controls {
   justify-self: end;
+  position: relative;
 
   width: 15rem;
   max-width: 15rem;
+  display: flex;
+  flex-direction: column;
 
   .menu {
     margin-bottom: 1rem;
     font-size: 1.5rem;
-
-    .iconButton {
-      background: none;
-      border: none;
-      color: var(--icon-color);
-      font-size: 1.5rem;
-      cursor: pointer;
-      padding: 0 0.5rem;
-
-      &:hover {
-        filter: var(--icon-shift);
-      }
-    }
   }
 
   .nameInputForm {
     display: flex;
     margin-bottom: 1rem;
-
-    &.importMode {
-      align-items: flex-start;
-    }
 
     .nameInput {
       flex-grow: 1;

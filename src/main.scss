@@ -9,25 +9,7 @@ body {
   color: var(--text-color);
 }
 
-.light {
-  --background-color: #fff;
-  --textarea-background-color: #fff;
-  --fork-me-background-color: #ddd;
-  --text-color: #888;
-  --icon-color: #222;
-  --strong-color: #222;
-  --h1-color: #444;
-  --h2-color: #666;
-  --small-color: #222;
-  --small-hover-color: #666;
-  --border-color: #333;
-  --hr-color: #f0f0f0;
-  --code-text-color: #222;
-  --winner-overlay: #b4b4b4;
-  --icon-shift: invert(0.5);
-}
-
-.dark {
+:root, [data-theme="dark"], .dark {
   --background-color: #222;
   --textarea-background-color: #444;
   --fork-me-background-color: #444;
@@ -43,4 +25,22 @@ body {
   --code-text-color: #aaa;
   --winner-overlay: #464646;
   --icon-shift: brightness(0.5);
+}
+
+[data-theme="light"], .light {
+  --background-color: #fff;
+  --textarea-background-color: #fff;
+  --fork-me-background-color: #ddd;
+  --text-color: #888;
+  --icon-color: #222;
+  --strong-color: #222;
+  --h1-color: #444;
+  --h2-color: #666;
+  --small-color: #222;
+  --small-hover-color: #666;
+  --border-color: #333;
+  --hr-color: #f0f0f0;
+  --code-text-color: #222;
+  --winner-overlay: #b4b4b4;
+  --icon-shift: invert(0.5);
 }

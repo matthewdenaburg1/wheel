@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sector from './Sector';
-import styles from './Wheel.module.scss';
+import styles from '../styles/components/Wheel.module.scss';
 
 import { usePeople } from '../context/PeopleContext';
 

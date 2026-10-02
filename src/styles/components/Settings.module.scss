@@ -1,0 +1,27 @@
+.settings {
+  .menu {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+
+    .iconButton {
+      background: none;
+      border: none;
+      color: var(--icon-color);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0 0.5rem;
+
+      &:hover {
+        filter: var(--icon-shift);
+      }
+    }
+
+    .iconButton.settingsButton:not(.active) {
+      border-bottom: 2px solid transparent;
+    }
+
+    .active {
+      border-bottom: 2px solid var(--icon-color);
+    }
+  }
+}

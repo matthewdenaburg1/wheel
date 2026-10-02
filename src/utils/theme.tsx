@@ -23,13 +23,7 @@ export function toTheme(value: string | null): Theme {
   }
 }
 
-export interface ThemeControls {
-  theme: Theme;
-  toggleTheme: () => void;
-  setTheme: (theme: Theme) => void;
-}
-
-export const useTheme = (initialTheme: Theme | null = null): ThemeControls => {
+export const useTheme = (initialTheme: Theme | null = null): [Theme, () => void] => {
   const [theme, setTheme] = useState(initialTheme ?? 'dark');
 
   useEffect(() => {
@@ -39,10 +33,14 @@ export const useTheme = (initialTheme: Theme | null = null): ThemeControls => {
       return;
     }
 
-    const savedTheme = toTheme(localStorage.getItem('theme'));
+    const currentTheme = toTheme(localStorage.getItem('theme')) || theme;
 
-    if (savedTheme) {
-      setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', currentTheme || theme);
+    localStorage.setItem('theme', theme);
+
+
+    if (currentTheme) {
+      setTheme(currentTheme);
     } else if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
       setTheme('dark');
     }
@@ -57,5 +55,5 @@ export const useTheme = (initialTheme: Theme | null = null): ThemeControls => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light' ));
   };
 
-  return {theme, toggleTheme, setTheme};
+  return [theme, toggleTheme];
 };

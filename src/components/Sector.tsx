@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Sector.module.scss';
+import styles from '../styles/components/Sector.module.scss';
 import { hslColorString, isDarkColor } from '../utils/color';
 
 /**
