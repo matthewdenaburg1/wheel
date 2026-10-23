@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './Sector.module.scss';
 import { hslColorString, isDarkColor } from '../utils/color';
+import { usePeople } from '../context/PeopleContext';
+import { getPersonAbbreviation } from '../utils/abbreviate';
 
 /**
  * @see https://en.wikipedia.org/wiki/Circular_sector
  */
 interface SectorProps {
-  name: string;
+  person?: Person;
+  name?: string;
   index: number;
   sectorAngle: number;
   radius: number;
@@ -20,7 +23,22 @@ const pointToPathString = (point: { x: number; y: number }): string => {
   return `${point.x} ${point.y}`
 };
 
-const Sector: React.FC<SectorProps> = ({ name, index, radius, sectorAngle }) => {
+const Sector: React.FC<SectorProps> = ({ person, name, index, radius, sectorAngle }) => {
+  const { people } = usePeople();
+  const [isMobile, setIsMobile] = useState<boolean>(() => window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const displayName = person
+    ? (isMobile ? getPersonAbbreviation(person, people) : person.name)
+    : (name ?? '');
+
   const color = hslColorString(Math.floor(index * sectorAngle));
 
   /**
@@ -91,7 +109,7 @@ const Sector: React.FC<SectorProps> = ({ name, index, radius, sectorAngle }) => 
           transformOrigin: 'left'
         }}
       >
-        {name}
+        {displayName}
       </div>
     </div>
   );

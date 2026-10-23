@@ -34,4 +34,11 @@
       }
     }
   }
+
+  @media (max-width: 768px) {
+    max-height: 25vh;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+  }
 }

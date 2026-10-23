@@ -17,6 +17,7 @@ const SPIN_DURATION = 1500; // in milliseconds
 const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, resetTrigger }) => {
   const { people } = usePeople();
   const [rotation, setRotation] = useState(0);
+  const [scale, setScale] = useState(1);
   const enabledPeople = useMemo(() => people.filter((p) => p.enabled), [people]);
 
   const syncSectorAngle = () => {
@@ -29,6 +30,21 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
   }, [enabledPeople.length]);
 
   const [sectorAngle, setSectorAngle] = useState(syncSectorAngle());
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (window.innerWidth <= 768) {
+        const targetSize = Math.min(window.innerWidth * 0.65, 300);
+        setScale(targetSize / radius);
+      } else {
+        setScale(1);
+      }
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [radius]);
 
   useEffect(() => {
     if (isSpinning && enabledPeople.length > 0) {
@@ -54,36 +70,52 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
     setRotation(0);
   }, [resetTrigger]);
 
+  const scaledDimension = radius * scale;
+
   return (
-    <div>
+    <div className={styles.wheelWrapper}>
       <div
-        className={styles.wheelContainer}
-        onClick={onSpin}
-        data-testid="wheel-container"
+        className={styles.wheelScaler}
+        style={{
+          width: `${scaledDimension}px`,
+          height: `${scaledDimension}px`,
+        }}
       >
-        <div className={styles.pointer}></div>
         <div
-          className={styles.wheel}
-          data-testid="wheel"
+          className={styles.wheelContainer}
+          onClick={onSpin}
+          data-testid="wheel-container"
           style={{
-            transform: `rotate(${rotation}deg)`,
-            transition: isSpinning ? `transform ${SPIN_DURATION / 1000}s ease-out` : 'none',
+            width: `${radius}px`,
+            height: `${radius}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
           }}
         >
-          {
-            enabledPeople.map((person, index) => {
-              return <Sector
-                key={person.id}
-                name={person.name}
-                index={index}
-                radius={radius}
-                sectorAngle={sectorAngle}
-              />;
-            })
-          }
+          <div className={styles.pointer}></div>
+          <div
+            className={styles.wheel}
+            data-testid="wheel"
+            style={{
+              transform: `rotate(${rotation}deg)`,
+              transition: isSpinning ? `transform ${SPIN_DURATION / 1000}s ease-out` : 'none',
+            }}
+          >
+            {
+              enabledPeople.map((person, index) => {
+                return <Sector
+                  key={person.id}
+                  person={person}
+                  index={index}
+                  radius={radius}
+                  sectorAngle={sectorAngle}
+                />;
+              })
+            }
+          </div>
         </div>
-        <div className={styles.caption}>Click to Spin!</div>
       </div>
+      <div className={styles.caption}>Click to Spin!</div>
     </div>
   );
 };

@@ -66,11 +66,8 @@ const App: React.FC = () => {
       <div className={styles.header}>
         <h1>Wheel of Names</h1>
       </div>
-      <div className={styles.content}>
-        <PeopleContext.Provider value={{ people, setPeople }}>
-          <Controls
-            onToggleTheme={toggleTheme}
-          />
+      <PeopleContext.Provider value={{ people, setPeople }}>
+        <div className={styles.content}>
           <Wheel
             isSpinning={isSpinning}
             radius={500}
@@ -78,8 +75,11 @@ const App: React.FC = () => {
             onSpinEnd={handleSpinEnd}
             resetTrigger={resetWheelTrigger}
           />
-        </PeopleContext.Provider>
-      </div>
+          <Controls
+            onToggleTheme={toggleTheme}
+          />
+        </div>
+      </PeopleContext.Provider>
       <WinnerDisplay
         winner={winner}
         onClose={handleCloseWinner}

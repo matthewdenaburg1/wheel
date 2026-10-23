@@ -8,7 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
+  z-index: 1000;
 
   .winnerBox {
     background-color: var(--winner-overlay);
@@ -19,6 +19,7 @@
     top: 25vh;
     left: 25vw;
     width: 50vw;
+    box-sizing: border-box;
 
     h3 {
       color: var(--h2-color);
@@ -29,6 +30,25 @@
       color: var(--h1-color);
       font-size: 3rem;
       margin: 0;
+      word-break: break-word;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .winnerBox {
+      top: 30vh;
+      left: 7.5vw;
+      width: 85vw;
+      padding: 1.5rem 1rem;
+
+      h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
     }
   }
 }

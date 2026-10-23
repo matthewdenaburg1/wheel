@@ -1,12 +1,12 @@
 .controls {
   justify-self: end;
-
   width: 15rem;
   max-width: 15rem;
 
-  .menu {
+  .desktopMenu {
     margin-bottom: 1rem;
     font-size: 1.5rem;
+    display: flex;
 
     .iconButton {
       background: none;
@@ -20,6 +20,10 @@
         filter: var(--icon-shift);
       }
     }
+  }
+
+  .mobileMenuContainer {
+    display: none;
   }
 
   .nameInputForm {
@@ -61,6 +65,91 @@
 
       &:hover {
         filter: var(--icon-shift);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .controls {
+    width: 100%;
+    max-width: 100%;
+
+    .desktopMenu {
+      display: none;
+    }
+
+    .mobileMenuContainer {
+      position: fixed;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .mobileIconButtonWrapper {
+        position: relative;
+
+        .iconButton {
+          background: var(--textarea-background-color);
+          border: 1px solid var(--border-color);
+          border-radius: 50%;
+          width: 2.25rem;
+          height: 2.25rem;
+          color: var(--icon-color);
+          font-size: 1.1rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            filter: var(--icon-shift);
+          }
+        }
+
+        .dropdownMenu {
+          position: absolute;
+          right: 0;
+          top: 2.75rem;
+          background-color: var(--textarea-background-color);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+          display: flex;
+          flex-direction: column;
+          min-width: 11rem;
+          overflow: hidden;
+          z-index: 1001;
+
+          .dropdownItem {
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            &:hover {
+              background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .dropdownIcon {
+              width: 1.25rem;
+              text-align: center;
+            }
+          }
+        }
       }
     }
   }
