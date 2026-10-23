@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Sector from './Sector';
 import styles from './Wheel.module.scss';
 
@@ -17,12 +17,12 @@ const SPIN_DURATION = 1500; // in milliseconds
 const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, resetTrigger }) => {
   const { people } = usePeople();
   const [rotation, setRotation] = useState(0);
-  const enabledPeople = people.filter((p) => p.enabled);
+  const enabledPeople = useMemo(() => people.filter((p) => p.enabled), [people]);
 
   const syncSectorAngle = () => {
     const length = enabledPeople.length;
     return length <= 1 ? 359.999 : 360 / Math.floor(length);
-  }
+  };
 
   useEffect(() => {
     setSectorAngle(syncSectorAngle());
@@ -31,8 +31,8 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
   const [sectorAngle, setSectorAngle] = useState(syncSectorAngle());
 
   useEffect(() => {
-    if (isSpinning) {
-      const winnerIndex = Math.floor(Math.random() * enabledPeople.length); // TODO: this could be improved
+    if (isSpinning && enabledPeople.length > 0) {
+      const winnerIndex = Math.floor(Math.random() * enabledPeople.length);
 
       const winner = enabledPeople[winnerIndex];
       const winnerAngle = winnerIndex * sectorAngle + sectorAngle / 2;
@@ -42,11 +42,13 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
 
       setRotation(finalRotation);
 
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         onSpinEnd(winner);
       }, SPIN_DURATION);
+
+      return () => clearTimeout(timer);
     }
-  }, [isSpinning, enabledPeople, onSpinEnd, sectorAngle]);
+  }, [isSpinning]);
 
   useEffect(() => {
     setRotation(0);
@@ -57,10 +59,12 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
       <div
         className={styles.wheelContainer}
         onClick={onSpin}
+        data-testid="wheel-container"
       >
         <div className={styles.pointer}></div>
         <div
           className={styles.wheel}
+          data-testid="wheel"
           style={{
             transform: `rotate(${rotation}deg)`,
             transition: isSpinning ? `transform ${SPIN_DURATION / 1000}s ease-out` : 'none',

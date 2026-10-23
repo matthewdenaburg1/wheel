@@ -1,8 +1,9 @@
-import type { UserConfig } from 'vite';
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config';
 
 const env = process.env.NODE_ENV || 'main';
 
-export default {
+export default defineConfig({
   root: './src',
   base: '/wheel',
 
@@ -20,5 +21,11 @@ export default {
 
   server: {
     open: true
-  }
-} satisfies UserConfig
+  },
+
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./setupTests.tsx'],
+  },
+});
