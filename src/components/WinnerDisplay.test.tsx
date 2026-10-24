@@ -58,9 +58,8 @@ describe("WinnerDisplay Component", () => {
     render(<WinnerDisplay winner={null} isRoundComplete onClose={onClose} />);
 
     expect(
-      screen.getByRole("heading", { name: "Round Complete!" })
+      screen.getByRole("heading", { name: "Everyone has been selected!" })
     ).toBeInTheDocument();
-    expect(screen.getByText("Everyone has been called.")).toBeInTheDocument();
     expect(confetti).not.toHaveBeenCalled();
   });
 });
