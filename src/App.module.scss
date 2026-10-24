@@ -1,8 +1,16 @@
 .app {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+
   .header {
     width: 100%;
     text-align: center;
-    margin: 2vh 0;
+    margin: 2vh 0 1vh 0;
+    flex-shrink: 0;
 
     h1 {
       color: var(--h1-color);
@@ -13,7 +21,7 @@
 
   .content {
     margin: 0;
-    margin-top: 5vh;
+    margin-top: 2vh;
     position: relative;
 
     display: flex;
@@ -21,7 +29,8 @@
     align-items: flex-start;
     justify-content: center;
 
-    height: 100%;
+    flex: 1;
+    overflow: hidden;
   }
 
   .forkMe {
@@ -50,17 +59,52 @@
     }
   }
 
+  @media (max-width: 768px) and (orientation: portrait) {
+    .header {
+      margin: 1.5vh 0 0.5vh 0;
 
-  @media (max-width: 800px) {
-    .content {
-      flex-direction: column;
-      padding: 0 3vw;
-      margin-top: 5vh;
+      h1 {
+        font-size: 1.4rem;
+      }
     }
 
-    .controls {
-      width: 100%;
-      margin-bottom: 2rem;
+    .content {
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0 1rem 1rem 1rem;
+      margin-top: 1vh;
+      gap: 1rem;
+      min-height: 0;
+      overflow: hidden;
+
+      > :first-child {
+        order: 2;
+      }
+
+      > :last-child {
+        order: 1;
+      }
+    }
+  }
+
+  @media (max-width: 768px), (max-height: 500px) {
+    .forkMe {
+      display: none;
+    }
+  }
+
+  @media (max-height: 500px) {
+    .header {
+      margin: 1vh 0 0.5vh 0;
+
+      h1 {
+        font-size: 1.3rem;
+      }
+    }
+
+    .content {
+      margin-top: 1vh;
     }
   }
 }

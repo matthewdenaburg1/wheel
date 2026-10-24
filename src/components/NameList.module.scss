@@ -1,37 +1,115 @@
-.nameList {
-  .person {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--border-color);
+.nameListWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
 
-    .name {
-      flex-grow: 1;
+  .nameList {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+
+    // Custom scrollbar styling
+    &::-webkit-scrollbar {
+      width: 6px;
     }
 
-    .button {
-      border: none;
-      font-size: 1rem;
-      color: var(--icon-color);
-      background: none;
-      cursor: pointer;
-
-      &:hover {
-        filter: var(--icon-shift);
-      }
+    &::-webkit-scrollbar-track {
+      background: transparent;
     }
 
-    &.disabled {
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+
+    .person {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border-color);
+
       .name {
-        text-decoration: line-through;
-        opacity: 0.5;
+        flex-grow: 1;
       }
 
-      button:hover {
-        filter: none;
-        cursor: default;
+      .button {
+        border: none;
+        font-size: 1rem;
+        color: var(--icon-color);
+        background: none;
+        cursor: pointer;
+
+        &:hover {
+          filter: var(--icon-shift);
+        }
       }
+
+      &.disabled {
+        .name {
+          text-decoration: line-through;
+          opacity: 0.5;
+        }
+
+        button:hover {
+          filter: none;
+          cursor: default;
+        }
+      }
+    }
+  }
+
+  .scrollIndicator {
+    display: none;
+    pointer-events: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1.5rem;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--background-color)
+    );
+    align-items: flex-end;
+    justify-content: center;
+    color: var(--text-color);
+    font-size: 0.75rem;
+    opacity: 0.7;
+    animation: bounce 1.5s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
+  }
+
+  @media (max-width: 768px) and (orientation: portrait) {
+    .nameList {
+      max-height: none;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .scrollIndicator {
+      display: flex;
+    }
+  }
+
+  @media (max-height: 500px) {
+    .nameList {
+      max-height: 45vh;
     }
   }
 }
