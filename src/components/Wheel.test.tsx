@@ -1,6 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import React from 'react';
 import Wheel from './Wheel';
 import { PeopleContext } from '../context/PeopleContext';
 
@@ -184,5 +183,20 @@ describe('Wheel Component', () => {
     expect(screen.getByText('Bob')).toBeInTheDocument();
     expect(screen.getByText('Charlie')).toBeInTheDocument();
     expect(screen.getByText('Dave')).toBeInTheDocument();
+  });
+
+  it('does not invoke onSpinEnd when spinning with no enabled people', () => {
+    const onSpinEnd = vi.fn();
+    const people: Person[] = [
+      { id: 1, name: 'Alice', enabled: false },
+    ];
+
+    renderWheel(people, { isSpinning: true, onSpinEnd });
+
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    expect(onSpinEnd).not.toHaveBeenCalled();
   });
 });
