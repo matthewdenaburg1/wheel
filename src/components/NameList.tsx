@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styles from './NameList.module.scss';
-import { usePeople } from '../context/PeopleContext';
-import { useAppMode } from '../context/AppModeContext';
+import React, { useState, useEffect, useRef } from "react";
+import styles from "./NameList.module.scss";
+import { usePeople } from "../context/PeopleContext";
+import { useAppMode } from "../context/AppModeContext";
 
 const NameList: React.FC = () => {
   const { people, setPeople } = usePeople();
@@ -10,12 +10,12 @@ const NameList: React.FC = () => {
   const [canScrollDown, setCanScrollDown] = useState(false);
 
   const sortedPeople =
-    mode === 'round-robin'
+    mode === "round-robin"
       ? [
           ...people
-            .filter((p) => p.order !== undefined)
+            .filter(p => p.order !== undefined)
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
-          ...people.filter((p) => p.order === undefined),
+          ...people.filter(p => p.order === undefined)
         ]
       : people;
 
@@ -30,50 +30,56 @@ const NameList: React.FC = () => {
     checkScroll();
     const listEl = listRef.current;
     if (listEl) {
-      listEl.addEventListener('scroll', checkScroll);
-      window.addEventListener('resize', checkScroll);
+      listEl.addEventListener("scroll", checkScroll);
+      window.addEventListener("resize", checkScroll);
     }
     return () => {
       if (listEl) {
-        listEl.removeEventListener('scroll', checkScroll);
+        listEl.removeEventListener("scroll", checkScroll);
       }
-      window.removeEventListener('resize', checkScroll);
+      window.removeEventListener("resize", checkScroll);
     };
   }, [people, mode]);
 
   const handleRemoveName = (id: number) => {
-    const person = people.find((p) => p.id === id);
+    const person = people.find(p => p.id === id);
     if (person && person.enabled && person.order === undefined) {
-      setPeople(people.filter((p) => p.id !== id));
+      setPeople(people.filter(p => p.id !== id));
     }
   };
 
   const handleToggleEnabled = (id: number) => {
-    if (mode === 'round-robin') {
-      const person = people.find((p) => p.id === id);
+    if (mode === "round-robin") {
+      const person = people.find(p => p.id === id);
       if (person?.order !== undefined) return; // locked, ignore
     }
-    setPeople(people.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)));
+    setPeople(
+      people.map(p => (p.id === id ? { ...p, enabled: !p.enabled } : p))
+    );
   };
 
   return (
     <div className={styles.nameListWrapper}>
       <div
-        className={`${styles.nameList} ${mode === 'round-robin' ? styles.roundRobin : ''}`}
+        className={`${styles.nameList} ${mode === "round-robin" ? styles.roundRobin : ""}`}
         ref={listRef}
       >
-        {sortedPeople.map((person) => {
-          const isLocked = mode === 'round-robin' && person.order !== undefined;
+        {sortedPeople.map(person => {
+          const isLocked = mode === "round-robin" && person.order !== undefined;
           return (
             <div
               key={person.id}
-              className={`${styles.person} ${!person.enabled ? styles.disabled : ''} ${isLocked ? styles.locked : ''}`}
+              className={`${styles.person} ${!person.enabled ? styles.disabled : ""} ${isLocked ? styles.locked : ""}`}
             >
-              {isLocked && <span className={styles.orderBadge}>#{person.order}</span>}
+              {isLocked && (
+                <span className={styles.orderBadge}>#{person.order}</span>
+              )}
               <label
                 id={`checkbox-${person.id}`}
-                className={[styles.name, styles.button].join(' ')}
-                onClick={() => (isLocked ? undefined : handleToggleEnabled(person.id))}
+                className={[styles.name, styles.button].join(" ")}
+                onClick={() =>
+                  isLocked ? undefined : handleToggleEnabled(person.id)
+                }
               >
                 {person.name}
               </label>
@@ -97,10 +103,7 @@ const NameList: React.FC = () => {
         })}
       </div>
       {canScrollDown && (
-        <div
-          className={styles.scrollIndicator}
-          aria-hidden="true"
-        >
+        <div className={styles.scrollIndicator} aria-hidden="true">
           <span className="fa fa-chevron-down"></span>
         </div>
       )}

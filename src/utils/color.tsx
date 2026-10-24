@@ -23,45 +23,44 @@ export const isDarkColor = (hslColor: string): boolean => {
   const s = parseInt(hsl[2]) / 100;
   const l = parseInt(hsl[3]) / 100;
 
-  const {r, g, b} = hslToRgb(h, s, l);
+  const { r, g, b } = hslToRgb(h, s, l);
   const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
 
   return hsp <= 127.5;
 };
 
-const hslToRgb = (h: number, s: number, l: number): { r: number; g: number; b: number } => {
+const hslToRgb = (
+  h: number,
+  s: number,
+  l: number
+): { r: number; g: number; b: number } => {
   // chroma
   const c = (1 - Math.abs(2 * l - 1)) * s;
   const hPrime = h / 60;
   // intermediate value
-  const x = c * (1 - Math.abs(hPrime % 2 - 1));
+  const x = c * (1 - Math.abs((hPrime % 2) - 1));
   // match lightness
   const m = l - c / 2;
 
   let r: number = 0,
-      g: number = 0,
-      b: number = 0;
+    g: number = 0,
+    b: number = 0;
   if (hPrime <= 1) {
     r = c;
     g = x;
-  }
-  else if (hPrime <= 2) {
+  } else if (hPrime <= 2) {
     r = x;
     g = c;
-  }
-  else if (hPrime <= 3) {
+  } else if (hPrime <= 3) {
     g = c;
     b = x;
-  }
-  else if (hPrime <= 4) {
+  } else if (hPrime <= 4) {
     g = x;
     b = c;
-  }
-  else if (hPrime <= 5) {
+  } else if (hPrime <= 5) {
     r = x;
     b = c;
-  }
-  else if (hPrime <= 6) {
+  } else if (hPrime <= 6) {
     r = c;
     b = x;
   }

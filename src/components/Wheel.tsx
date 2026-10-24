@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import Sector from './Sector';
-import styles from './Wheel.module.scss';
+import React, { useState, useEffect, useMemo } from "react";
+import Sector from "./Sector";
+import styles from "./Wheel.module.scss";
 
-import { usePeople } from '../context/PeopleContext';
+import { usePeople } from "../context/PeopleContext";
 
 interface WheelProps {
   isSpinning: boolean;
@@ -14,11 +14,17 @@ interface WheelProps {
 
 const SPIN_DURATION = 1500; // in milliseconds
 
-const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, resetTrigger }) => {
+const Wheel: React.FC<WheelProps> = ({
+  isSpinning,
+  radius,
+  onSpin,
+  onSpinEnd,
+  resetTrigger
+}) => {
   const { people } = usePeople();
   const [rotation, setRotation] = useState(0);
   const [scale, setScale] = useState(1);
-  const enabledPeople = useMemo(() => people.filter((p) => p.enabled), [people]);
+  const enabledPeople = useMemo(() => people.filter(p => p.enabled), [people]);
 
   const syncSectorAngle = () => {
     const length = enabledPeople.length;
@@ -35,7 +41,11 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
     const updateScale = () => {
       if (window.innerWidth > window.innerHeight) {
         // More horizontal space than vertical: vertical space is the constraint
-        const targetSize = Math.min(window.innerHeight * 0.7, window.innerWidth * 0.6, radius);
+        const targetSize = Math.min(
+          window.innerHeight * 0.7,
+          window.innerWidth * 0.6,
+          radius
+        );
         setScale(targetSize / radius);
       } else {
         // More vertical space than horizontal: horizontal space is the constraint
@@ -49,8 +59,8 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
     };
 
     updateScale();
-    window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
   }, [radius]);
 
   useEffect(() => {
@@ -85,7 +95,7 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
         className={styles.wheelScaler}
         style={{
           width: `${scaledDimension}px`,
-          height: `${scaledDimension}px`,
+          height: `${scaledDimension}px`
         }}
       >
         <div
@@ -96,7 +106,7 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
             width: `${radius}px`,
             height: `${radius}px`,
             transform: `scale(${scale})`,
-            transformOrigin: 'top left',
+            transformOrigin: "top left"
           }}
         >
           <div className={styles.pointer}></div>
@@ -105,20 +115,22 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
             data-testid="wheel"
             style={{
               transform: `rotate(${rotation}deg)`,
-              transition: isSpinning ? `transform ${SPIN_DURATION / 1000}s ease-out` : 'none',
+              transition: isSpinning
+                ? `transform ${SPIN_DURATION / 1000}s ease-out`
+                : "none"
             }}
           >
-            {
-              enabledPeople.map((person, index) => {
-                return <Sector
+            {enabledPeople.map((person, index) => {
+              return (
+                <Sector
                   key={person.id}
                   person={person}
                   index={index}
                   radius={radius}
                   sectorAngle={sectorAngle}
-                />;
-              })
-            }
+                />
+              );
+            })}
           </div>
         </div>
       </div>

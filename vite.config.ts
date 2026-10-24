@@ -1,18 +1,18 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
-const env = process.env.NODE_ENV || 'main';
+const env = process.env.NODE_ENV || "main";
 
 export default defineConfig({
-  root: './src',
-  base: '/wheel',
+  root: "./src",
+  base: "/wheel",
 
   build: {
     outDir: `../public/${env}`,
-    target: 'es6',
+    target: "es6",
     cssMinify: false,
     sourcemap: false,
-    emptyOutDir: true,
+    emptyOutDir: true
   },
 
   css: {
@@ -25,7 +25,7 @@ export default defineConfig({
 
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./setupTests.tsx'],
-  },
+    environment: "jsdom",
+    setupFiles: ["./setupTests.tsx"]
+  }
 });
