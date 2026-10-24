@@ -111,9 +111,9 @@ describe('NameList Component', () => {
     ];
 
     const { container } = renderNameList(people, setPeople, 'round-robin');
-    const personRows = container.querySelectorAll('[class*='person']');
+    const personRows = container.querySelectorAll('[class*="person"]');
 
-    expect(container.querySelector('[class*='roundRobin']')).toBeInTheDocument();
+    expect(container.querySelector('[class*="roundRobin"]')).toBeInTheDocument();
     expect(personRows[0]).toHaveTextContent('#1');
     expect(personRows[0]).toHaveTextContent('Charlie');
     expect(personRows[1]).toHaveTextContent('#2');
