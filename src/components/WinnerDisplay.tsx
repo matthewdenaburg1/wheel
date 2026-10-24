@@ -18,8 +18,7 @@ const WinnerDisplay: React.FC<WinnerDisplayProps> = ({
     return (
       <div className={styles.winnerOverlay} onClick={onClose}>
         <div className={styles.winnerBox}>
-          <h3>Round Complete!</h3>
-          <p>Everyone has been called.</p>
+          <h3>Everyone has had a turn!</h3>
         </div>
       </div>
     );
