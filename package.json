@@ -11,7 +11,7 @@
         "test": "vitest run"
     },
     "repository": {
-        "url": "git@github.com:matthewdenaburgvc/wheel.git",
+        "url": "git@github.com:matthewdenaburg1/wheel.git",
         "type": "git"
     },
     "engines": {
@@ -25,7 +25,7 @@
     ],
     "author": {
         "name": "Matthew Denaburg",
-        "email": "matthew.denaburg@veracross.com"
+        "email": "matthew.denaburg1@gmail.com"
     },
     "license": "UNLICENSED",
     "prettier": {
