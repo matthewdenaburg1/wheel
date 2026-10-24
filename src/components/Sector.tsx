@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import styles from './Sector.module.scss';
-import { hslColorString, isDarkColor } from '../utils/color';
-import { usePeople } from '../context/PeopleContext';
-import { getPersonAbbreviation } from '../utils/abbreviate';
+import React, { useState, useEffect } from "react";
+import styles from "./Sector.module.scss";
+import { hslColorString, isDarkColor } from "../utils/color";
+import { usePeople } from "../context/PeopleContext";
+import { getPersonAbbreviation } from "../utils/abbreviate";
 
 /**
  * @see https://en.wikipedia.org/wiki/Circular_sector
@@ -20,24 +20,34 @@ const toRadians = (angle: number): number => {
 };
 
 const pointToPathString = (point: { x: number; y: number }): string => {
-  return `${point.x} ${point.y}`
+  return `${point.x} ${point.y}`;
 };
 
-const Sector: React.FC<SectorProps> = ({ person, name, index, radius, sectorAngle }) => {
+const Sector: React.FC<SectorProps> = ({
+  person,
+  name,
+  index,
+  radius,
+  sectorAngle
+}) => {
   const { people } = usePeople();
-  const [isMobile, setIsMobile] = useState<boolean>(() => window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState<boolean>(
+    () => window.innerWidth <= 768
+  );
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const displayName = person
-    ? (isMobile ? getPersonAbbreviation(person, people) : person.name)
-    : (name ?? '');
+    ? isMobile
+      ? getPersonAbbreviation(person, people)
+      : person.name
+    : (name ?? "");
 
   const color = hslColorString(Math.floor(index * sectorAngle));
 
@@ -74,7 +84,7 @@ const Sector: React.FC<SectorProps> = ({ person, name, index, radius, sectorAngl
     largeArcFlag,
     1,
     pointToPathString(arcEndPoint)
-  ].join(' ');
+  ].join(" ");
 
   /**
    * the clip path for this portion of the sector.
@@ -84,8 +94,8 @@ const Sector: React.FC<SectorProps> = ({ person, name, index, radius, sectorAngl
     `M ${center}`,
     `L ${pointToPathString(arcStartPoint)}`,
     `A ${arc}`,
-    'Z',
-  ].join(' ');
+    "Z"
+  ].join(" ");
 
   return (
     <div
@@ -95,7 +105,7 @@ const Sector: React.FC<SectorProps> = ({ person, name, index, radius, sectorAngl
         clipPath: `path("${path}")`,
         // rotate the sector by the appropriate amount based on its index and the sector angle,
         // so that it is positioned correctly on the wheel
-        transform: `rotate(${index * sectorAngle - sectorAngle / 2}deg)`,
+        transform: `rotate(${index * sectorAngle - sectorAngle / 2}deg)`
       }}
     >
       {/* the name of the person, centered in the sector */}
@@ -106,7 +116,7 @@ const Sector: React.FC<SectorProps> = ({ person, name, index, radius, sectorAngl
 
           // counteract the rotation of the sector when it's added to the wheel by rotating back a little bit, so that the text is always horizontal
           transform: `rotate(${sectorAngle / 2}deg)`,
-          transformOrigin: 'left'
+          transformOrigin: "left"
         }}
       >
         {displayName}

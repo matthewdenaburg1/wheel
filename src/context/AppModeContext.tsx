@@ -4,10 +4,10 @@ import {
   useEffect,
   useState,
   type Dispatch,
-  type SetStateAction,
-} from 'react';
+  type SetStateAction
+} from "react";
 
-export type AppMode = 'normal' | 'round-robin';
+export type AppMode = "normal" | "round-robin";
 
 interface AppModeContextValue {
   mode: AppMode;
@@ -15,20 +15,23 @@ interface AppModeContextValue {
 }
 
 const AppModeContext = createContext<AppModeContextValue>({
-  mode: 'normal',
-  setMode: () => {},
+  mode: "normal",
+  setMode: () => {}
 });
 
 export const useAppMode = () => useContext(AppModeContext);
 
-export const useAppModeState = (): [AppMode, Dispatch<SetStateAction<AppMode>>] => {
+export const useAppModeState = (): [
+  AppMode,
+  Dispatch<SetStateAction<AppMode>>
+] => {
   const [mode, setMode] = useState<AppMode>(() => {
-    const saved = localStorage.getItem('appMode');
-    return saved === 'round-robin' || saved === 'normal' ? saved : 'normal';
+    const saved = localStorage.getItem("appMode");
+    return saved === "round-robin" || saved === "normal" ? saved : "normal";
   });
 
   useEffect(() => {
-    localStorage.setItem('appMode', mode);
+    localStorage.setItem("appMode", mode);
   }, [mode]);
 
   return [mode, setMode];

@@ -1,15 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { AppModeContext, useAppModeState } from './context/AppModeContext';
-import Controls from './components/Controls';
-import Wheel from './components/Wheel';
-import WinnerDisplay from './components/WinnerDisplay';
+import React, { useState, useRef, useEffect } from "react";
+import { AppModeContext, useAppModeState } from "./context/AppModeContext";
+import Controls from "./components/Controls";
+import Wheel from "./components/Wheel";
+import WinnerDisplay from "./components/WinnerDisplay";
 
-import { PeopleContext, usePeopleState } from './context/PeopleContext';
+import { PeopleContext, usePeopleState } from "./context/PeopleContext";
 
-import { useTheme } from './utils/theme';
-import { loadNamesFromUrl } from './utils/url';
+import { useTheme } from "./utils/theme";
+import { loadNamesFromUrl } from "./utils/url";
 
-import styles from './App.module.scss';
+import styles from "./App.module.scss";
 
 const App: React.FC = () => {
   const [people, setPeople] = usePeopleState();
@@ -22,8 +22,10 @@ const App: React.FC = () => {
   const [mode, setMode] = useAppModeState();
 
   useEffect(() => {
-    if (mode === 'normal') {
-      setPeople((prev) => prev.map((p) => ({ ...p, enabled: true, order: undefined })));
+    if (mode === "normal") {
+      setPeople(prev =>
+        prev.map(p => ({ ...p, enabled: true, order: undefined }))
+      );
     }
   }, [mode]);
 
@@ -31,15 +33,15 @@ const App: React.FC = () => {
     const namesFromUrl = loadNamesFromUrl().sort(() => Math.random() - 0.5);
     const people =
       namesFromUrl.length > 0
-        ? namesFromUrl.map((name) => ({
+        ? namesFromUrl.map(name => ({
             id: nextId.current++,
             name,
-            enabled: true,
+            enabled: true
           }))
         : Array.from({ length: 6 }, (_, i) => ({
             id: nextId.current++,
             name: `Person ${i + 1}`,
-            enabled: true,
+            enabled: true
           }));
 
     people.sort(() => Math.random() - 0.5);
@@ -47,7 +49,7 @@ const App: React.FC = () => {
   }, []);
 
   const handleSpin = () => {
-    if (people.filter((p) => p.enabled).length > 0 && !isSpinning) {
+    if (people.filter(p => p.enabled).length > 0 && !isSpinning) {
       setIsSpinning(true);
     }
   };
@@ -59,18 +61,20 @@ const App: React.FC = () => {
 
   const handleCloseWinner = () => {
     if (winner) {
-      if (mode === 'round-robin') {
-        const nextOrder = people.filter((p) => p.order !== undefined).length + 1;
-        const updatedPeople = people.map((p) =>
-          p.id === winner.id ? { ...p, enabled: false, order: nextOrder } : p,
+      if (mode === "round-robin") {
+        const nextOrder = people.filter(p => p.order !== undefined).length + 1;
+        const updatedPeople = people.map(p =>
+          p.id === winner.id ? { ...p, enabled: false, order: nextOrder } : p
         );
         setPeople(updatedPeople);
-        const allDone = updatedPeople.every((p) => p.order !== undefined);
+        const allDone = updatedPeople.every(p => p.order !== undefined);
         if (allDone) {
           setRoundComplete(true);
         }
       } else {
-        setPeople(people.map((p) => (p.id === winner.id ? { ...p, enabled: false } : p)));
+        setPeople(
+          people.map(p => (p.id === winner.id ? { ...p, enabled: false } : p))
+        );
       }
     }
     setWinner(null);
@@ -101,7 +105,9 @@ const App: React.FC = () => {
           <WinnerDisplay
             winner={winner}
             isRoundComplete={roundComplete}
-            onClose={roundComplete ? handleCloseRoundComplete : handleCloseWinner}
+            onClose={
+              roundComplete ? handleCloseRoundComplete : handleCloseWinner
+            }
           />
           <div className={styles.forkMe}>
             <div className={styles.wrapper}>
