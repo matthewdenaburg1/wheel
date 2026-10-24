@@ -74,6 +74,15 @@
   .controls {
     width: 100%;
     max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+
+    .nameInputForm {
+      flex-shrink: 0;
+    }
 
     .desktopMenu {
       display: none;

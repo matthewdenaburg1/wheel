@@ -64,7 +64,7 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
 
       return () => clearTimeout(timer);
     }
-  }, [isSpinning]);
+  }, [isSpinning, enabledPeople, sectorAngle, onSpinEnd]);
 
   useEffect(() => {
     setRotation(0);

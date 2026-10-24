@@ -68,15 +68,15 @@ const App: React.FC = () => {
       </div>
       <PeopleContext.Provider value={{ people, setPeople }}>
         <div className={styles.content}>
+          <Controls
+            onToggleTheme={toggleTheme}
+          />
           <Wheel
             isSpinning={isSpinning}
             radius={500}
             onSpin={handleSpin}
             onSpinEnd={handleSpinEnd}
             resetTrigger={resetWheelTrigger}
-          />
-          <Controls
-            onToggleTheme={toggleTheme}
           />
         </div>
       </PeopleContext.Provider>

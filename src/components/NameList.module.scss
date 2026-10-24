@@ -1,4 +1,9 @@
 .nameList {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+
   .person {
     display: flex;
     justify-content: space-between;
@@ -36,9 +41,8 @@
   }
 
   @media (max-width: 768px) {
-    max-height: 25vh;
-    overflow-y: auto;
-    padding-right: 0.25rem;
-    -webkit-overflow-scrolling: touch;
+    max-height: none;
+    flex: 1;
+    min-height: 0;
   }
 }
