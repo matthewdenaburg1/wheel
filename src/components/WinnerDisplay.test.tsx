@@ -13,7 +13,12 @@ describe('WinnerDisplay Component', () => {
   });
 
   it('renders nothing when winner is null', () => {
-    const { container } = render(<WinnerDisplay winner={null} onClose={vi.fn()} />);
+    const { container } = render(
+      <WinnerDisplay
+        winner={null}
+        onClose={vi.fn()}
+      />,
+    );
 
     expect(container.firstChild).toBeNull();
     expect(confetti).not.toHaveBeenCalled();
@@ -23,7 +28,12 @@ describe('WinnerDisplay Component', () => {
     const winner: Person = { id: 1, name: 'Alice', enabled: true };
     const onClose = vi.fn();
 
-    render(<WinnerDisplay winner={winner} onClose={onClose} />);
+    render(
+      <WinnerDisplay
+        winner={winner}
+        onClose={onClose}
+      />,
+    );
 
     expect(screen.getByText('Next up is...')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Alice');
@@ -39,11 +49,31 @@ describe('WinnerDisplay Component', () => {
     const winner: Person = { id: 1, name: 'Alice', enabled: true };
     const onClose = vi.fn();
 
-    const { container } = render(<WinnerDisplay winner={winner} onClose={onClose} />);
+    const { container } = render(
+      <WinnerDisplay
+        winner={winner}
+        onClose={onClose}
+      />,
+    );
 
     const overlay = container.firstChild as HTMLElement;
     fireEvent.click(overlay);
 
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the round-complete message without triggering confetti', () => {
+    const onClose = vi.fn();
+    render(
+      <WinnerDisplay
+        winner={null}
+        isRoundComplete
+        onClose={onClose}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Round Complete!' })).toBeInTheDocument();
+    expect(screen.getByText('Everyone has been called.')).toBeInTheDocument();
+    expect(confetti).not.toHaveBeenCalled();
   });
 });

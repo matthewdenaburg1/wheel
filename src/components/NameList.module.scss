@@ -28,7 +28,13 @@
     scrollbar-width: thin;
     scrollbar-color: var(--border-color) transparent;
 
+    &.roundRobin {
+      margin-left: -1rem;
+      padding-left: 1rem;
+    }
+
     .person {
+      position: relative;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -62,6 +68,45 @@
           cursor: default;
         }
       }
+
+      .orderBadge {
+        position: absolute;
+        left: -1rem;
+        width: 0.75rem;
+        color: var(--icon-color);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-align: right;
+        opacity: 0.85;
+      }
+
+      &.locked {
+        .button:hover {
+          filter: none;
+          cursor: default;
+        }
+
+        .name {
+          cursor: default;
+          text-decoration: line-through;
+          opacity: 0.5;
+        }
+
+        .lockIcon {
+          display: flex;
+          flex: 0 0 2rem;
+          align-items: center;
+          justify-content: center;
+          height: 1.25rem;
+          cursor: default;
+          opacity: 0.4;
+          pointer-events: none;
+        }
+      }
+    }
+
+    &.roundRobin .person.disabled .name {
+      text-decoration: none;
     }
   }
 
@@ -73,11 +118,7 @@
     left: 0;
     right: 0;
     height: 1.5rem;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      var(--background-color)
-    );
+    background: linear-gradient(to bottom, transparent, var(--background-color));
     align-items: flex-end;
     justify-content: center;
     color: var(--text-color);
@@ -87,7 +128,8 @@
   }
 
   @keyframes bounce {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0);
     }
     50% {

@@ -2,13 +2,16 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import NameList from './NameList';
 import { PeopleContext } from '../context/PeopleContext';
+import { AppModeContext, type AppMode } from '../context/AppModeContext';
 
 describe('NameList Component', () => {
-  const renderNameList = (people: Person[], setPeople = vi.fn()) => {
+  const renderNameList = (people: Person[], setPeople = vi.fn(), mode: AppMode = 'normal') => {
     return render(
-      <PeopleContext.Provider value={{ people, setPeople }}>
-        <NameList />
-      </PeopleContext.Provider>
+      <AppModeContext.Provider value={{ mode, setMode: vi.fn() }}>
+        <PeopleContext.Provider value={{ people, setPeople }}>
+          <NameList />
+        </PeopleContext.Provider>
+      </AppModeContext.Provider>,
     );
   };
 
@@ -89,15 +92,38 @@ describe('NameList Component', () => {
 
   it('does not remove a disabled person when the delete button is clicked', () => {
     const setPeople = vi.fn();
-    const people: Person[] = [
-      { id: 1, name: 'Alice', enabled: false },
-    ];
+    const people: Person[] = [{ id: 1, name: 'Alice', enabled: false }];
 
     renderNameList(people, setPeople);
 
     const deleteButton = screen.getByRole('button');
     fireEvent.click(deleteButton);
 
+    expect(setPeople).not.toHaveBeenCalled();
+  });
+
+  it('shows ordered people first and locks them in round-robin mode', () => {
+    const setPeople = vi.fn();
+    const people: Person[] = [
+      { id: 1, name: 'Alice', enabled: false, order: 2 },
+      { id: 2, name: 'Bob', enabled: true },
+      { id: 3, name: 'Charlie', enabled: false, order: 1 },
+    ];
+
+    const { container } = renderNameList(people, setPeople, 'round-robin');
+    const personRows = container.querySelectorAll('[class*="person"]');
+
+    expect(container.querySelector('[class*="roundRobin"]')).toBeInTheDocument();
+    expect(personRows[0]).toHaveTextContent('#1');
+    expect(personRows[0]).toHaveTextContent('Charlie');
+    expect(personRows[1]).toHaveTextContent('#2');
+    expect(personRows[1]).toHaveTextContent('Alice');
+    expect(personRows[2]).toHaveTextContent('Bob');
+    expect(screen.getAllByLabelText('Locked')).toHaveLength(2);
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+
+    fireEvent.click(screen.getByText('Charlie'));
+    fireEvent.click(screen.getAllByLabelText('Locked')[0]);
     expect(setPeople).not.toHaveBeenCalled();
   });
 });

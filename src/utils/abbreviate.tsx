@@ -1,9 +1,3 @@
-export interface Person {
-  id: number;
-  name: string;
-  enabled: boolean;
-}
-
 /**
  * Computes an abbreviation for a person given the active list of people.
  *
