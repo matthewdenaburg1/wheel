@@ -33,11 +33,18 @@ const Wheel: React.FC<WheelProps> = ({ isSpinning, radius, onSpin, onSpinEnd, re
 
   useEffect(() => {
     const updateScale = () => {
-      if (window.innerWidth <= 768) {
-        const targetSize = Math.min(window.innerWidth * 0.65, 300);
+      if (window.innerWidth > window.innerHeight) {
+        // More horizontal space than vertical: vertical space is the constraint
+        const targetSize = Math.min(window.innerHeight * 0.7, window.innerWidth * 0.6, radius);
         setScale(targetSize / radius);
       } else {
-        setScale(1);
+        // More vertical space than horizontal: horizontal space is the constraint
+        if (window.innerWidth <= 768) {
+          const targetSize = Math.min(window.innerWidth * 0.65, 300);
+          setScale(targetSize / radius);
+        } else {
+          setScale(1);
+        }
       }
     };
 

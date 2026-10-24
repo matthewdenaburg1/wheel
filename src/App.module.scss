@@ -59,7 +59,7 @@
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 768px) and (orientation: portrait) {
     .header {
       margin: 1.5vh 0 0.5vh 0;
 
@@ -86,9 +86,25 @@
         order: 1;
       }
     }
+  }
 
+  @media (max-width: 768px), (max-height: 500px) {
     .forkMe {
       display: none;
+    }
+  }
+
+  @media (max-height: 500px) {
+    .header {
+      margin: 1vh 0 0.5vh 0;
+
+      h1 {
+        font-size: 1.3rem;
+      }
+    }
+
+    .content {
+      margin-top: 1vh;
     }
   }
 }

@@ -199,4 +199,81 @@ describe('Wheel Component', () => {
 
     expect(onSpinEnd).not.toHaveBeenCalled();
   });
+
+  describe('Responsive Scaling', () => {
+    const originalInnerWidth = window.innerWidth;
+    const originalInnerHeight = window.innerHeight;
+
+    afterEach(() => {
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: originalInnerWidth });
+      Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: originalInnerHeight });
+    });
+
+    it('scales the wheel based on vertical space when there is more horizontal space than vertical', () => {
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1000 });
+      Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 500 });
+
+      renderWheel([]);
+
+      const wheelContainer = screen.getByTestId('wheel-container');
+      const wheelScaler = wheelContainer.parentElement;
+
+      // targetSize = min(500 * 0.7 = 350, 1000 * 0.6 = 600, 500) = 350
+      // scale = 350 / 500 = 0.7
+      expect(wheelScaler).toHaveStyle({ width: '350px', height: '350px' });
+      expect(wheelContainer).toHaveStyle({ transform: 'scale(0.7)' });
+    });
+
+    it('caps the wheel scale at 1 when height is large in horizontal orientation', () => {
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1200 });
+      Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 900 });
+
+      renderWheel([]);
+
+      const wheelContainer = screen.getByTestId('wheel-container');
+      const wheelScaler = wheelContainer.parentElement;
+
+      expect(wheelScaler).toHaveStyle({ width: '500px', height: '500px' });
+      expect(wheelContainer).toHaveStyle({ transform: 'scale(1)' });
+    });
+
+    it('dynamically responds when window resize event is triggered', () => {
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1000 });
+      Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 600 });
+
+      renderWheel([]);
+
+      const wheelContainer = screen.getByTestId('wheel-container');
+      const wheelScaler = wheelContainer.parentElement;
+
+      // 600 * 0.7 = 420
+      expect(wheelScaler).toHaveStyle({ width: '420px', height: '420px' });
+      expect(wheelContainer).toHaveStyle({ transform: 'scale(0.84)' });
+
+      // Resize window height to 400
+      act(() => {
+        Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 400 });
+        window.dispatchEvent(new Event('resize'));
+      });
+
+      // 400 * 0.7 = 280
+      expect(wheelScaler).toHaveStyle({ width: '280px', height: '280px' });
+      expect(wheelContainer).toHaveStyle({ transform: 'scale(0.56)' });
+    });
+
+    it('scales based on horizontal space when there is more vertical space than horizontal', () => {
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 400 });
+      Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 800 });
+
+      renderWheel([]);
+
+      const wheelContainer = screen.getByTestId('wheel-container');
+      const wheelScaler = wheelContainer.parentElement;
+
+      // min(400 * 0.65 = 260, 300) = 260
+      // scale = 260 / 500 = 0.52
+      expect(wheelScaler).toHaveStyle({ width: '260px', height: '260px' });
+      expect(wheelContainer).toHaveStyle({ transform: 'scale(0.52)' });
+    });
+  });
 });

@@ -51,4 +51,20 @@
       }
     }
   }
+
+  @media (max-height: 500px) {
+    .winnerBox {
+      top: 15vh;
+      padding: 1rem;
+
+      h3 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      h1 {
+        font-size: 1.75rem;
+      }
+    }
+  }
 }

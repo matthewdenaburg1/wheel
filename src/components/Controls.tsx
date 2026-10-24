@@ -156,16 +156,16 @@ const Controls: React.FC<ControlsProps> = ({
       <div className={styles.mobileMenuContainer} ref={menuRef}>
         <div className={styles.mobileIconButtonWrapper}>
           <button
-            onClick={() => setActiveMenu(activeMenu === 'gear' ? null : 'gear')}
+            onClick={() => setActiveMenu(activeMenu === 'hamburger' ? null : 'hamburger')}
             className={styles.iconButton}
-            title="Settings"
-            aria-label="Settings"
+            title="Menu"
+            aria-label="Menu"
           >
-            <span className="fa fa-gear"></span>
+            <span className="fa fa-bars"></span>
           </button>
-          {activeMenu === 'gear' && (
+          {activeMenu === 'hamburger' && (
             <div className={styles.dropdownMenu}>
-              {gearMenuItems.map((item) => (
+              {hamburgerMenuItems.map((item) => (
                 <button
                   key={item.id}
                   className={styles.dropdownItem}
@@ -181,16 +181,16 @@ const Controls: React.FC<ControlsProps> = ({
 
         <div className={styles.mobileIconButtonWrapper}>
           <button
-            onClick={() => setActiveMenu(activeMenu === 'hamburger' ? null : 'hamburger')}
+            onClick={() => setActiveMenu(activeMenu === 'gear' ? null : 'gear')}
             className={styles.iconButton}
-            title="Menu"
-            aria-label="Menu"
+            title="Settings"
+            aria-label="Settings"
           >
-            <span className="fa fa-bars"></span>
+            <span className="fa fa-gear"></span>
           </button>
-          {activeMenu === 'hamburger' && (
+          {activeMenu === 'gear' && (
             <div className={styles.dropdownMenu}>
-              {hamburgerMenuItems.map((item) => (
+              {gearMenuItems.map((item) => (
                 <button
                   key={item.id}
                   className={styles.dropdownItem}
