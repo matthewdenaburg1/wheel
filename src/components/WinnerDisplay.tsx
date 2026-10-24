@@ -5,14 +5,30 @@ import confetti from 'canvas-confetti';
 interface WinnerDisplayProps {
   winner: Person | null;
   onClose: () => void;
+  isRoundComplete?: boolean;
 }
 
-const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, onClose }) => {
+const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, onClose, isRoundComplete }) => {
+  // Show round-complete message without confetti
+  if (isRoundComplete) {
+    return (
+      <div
+        className={styles.winnerOverlay}
+        onClick={onClose}
+      >
+        <div className={styles.winnerBox}>
+          <h3>Round Complete!</h3>
+          <p>Everyone has been called.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!winner) {
     return null;
   }
 
-  // Trigger confetti when the component renders with a winner
+  // Trigger confetti for a normal winner
   confetti({
     particleCount: 75,
     spread: 70,

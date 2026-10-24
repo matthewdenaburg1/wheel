@@ -3,6 +3,7 @@ import NameList from './NameList';
 import styles from './Controls.module.scss';
 import { usePeople } from '../context/PeopleContext';
 import { shareUrl } from '../utils/url';
+import { useAppMode, type AppMode } from '../context/AppModeContext';
 
 interface ControlsProps {
   onToggleTheme: () => void;
@@ -15,14 +16,20 @@ export interface MenuItem {
   onClick: () => void;
 }
 
-const Controls: React.FC<ControlsProps> = ({
-  onToggleTheme,
-}) => {
+const MODE_LABELS: Record<AppMode, string> = {
+  normal: 'Normal',
+  'round-robin': 'Round Robin',
+};
+
+const Controls: React.FC<ControlsProps> = ({ onToggleTheme }) => {
   const { people, setPeople } = usePeople();
+  const { mode, setMode } = useAppMode();
   const [name, setName] = useState('');
   const [isImportMode, setIsImportMode] = useState(false);
   const [importValue, setImportValue] = useState('');
   const [activeMenu, setActiveMenu] = useState<'gear' | 'hamburger' | null>(null);
+  const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
+  const [isMobileModeOpen, setIsMobileModeOpen] = useState(false);
   const nextId = useRef(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -39,6 +46,7 @@ const Controls: React.FC<ControlsProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setActiveMenu(null);
+        setIsMobileModeOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -46,6 +54,10 @@ const Controls: React.FC<ControlsProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (activeMenu !== 'gear') setIsMobileModeOpen(false);
+  }, [activeMenu]);
 
   const handleAddName = (name: string) => {
     const newPerson: Person = {
@@ -58,7 +70,7 @@ const Controls: React.FC<ControlsProps> = ({
   };
 
   const handleShare = () => {
-    shareUrl(people.map(p => p.name));
+    shareUrl(people.map((p) => p.name));
     setActiveMenu(null);
   };
 
@@ -150,10 +162,49 @@ const Controls: React.FC<ControlsProps> = ({
         >
           <span className="fa fa-file-import"></span>
         </button>
+        <div className={styles.modeMenuWrapper}>
+          <button
+            className={styles.modeButton}
+            onClick={() => setIsModeMenuOpen((open) => !open)}
+            title="App mode"
+            aria-label="App mode"
+            aria-expanded={isModeMenuOpen}
+            aria-haspopup="menu"
+          >
+            <span
+              className="fa fa-sliders"
+              aria-hidden="true"
+            ></span>
+          </button>
+          {isModeMenuOpen && (
+            <div
+              className={styles.modeMenu}
+              role="group"
+              aria-label="App mode"
+            >
+              {(['normal', 'round-robin'] as const).map((option) => (
+                <button
+                  key={option}
+                  className={styles.modeMenuOption}
+                  aria-pressed={mode === option}
+                  onClick={() => {
+                    setMode(option);
+                    setIsModeMenuOpen(false);
+                  }}
+                >
+                  {MODE_LABELS[option]}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Mobile Menus Container (Vertically Stacked Icons in Top Right) */}
-      <div className={styles.mobileMenuContainer} ref={menuRef}>
+      <div
+        className={styles.mobileMenuContainer}
+        ref={menuRef}
+      >
         <div className={styles.mobileIconButtonWrapper}>
           <button
             onClick={() => setActiveMenu(activeMenu === 'hamburger' ? null : 'hamburger')}
@@ -200,6 +251,45 @@ const Controls: React.FC<ControlsProps> = ({
                   {item.label}
                 </button>
               ))}
+              {isMobileModeOpen ? (
+                <div
+                  className={`${styles.modeMenu} ${styles.modeMenuInline}`}
+                  role="group"
+                  aria-label="App mode"
+                >
+                  {(['normal', 'round-robin'] as const).map((option) => (
+                    <button
+                      key={option}
+                      className={styles.modeMenuOption}
+                      aria-pressed={mode === option}
+                      onClick={() => {
+                        setMode(option);
+                        setIsMobileModeOpen(false);
+                        setActiveMenu(null);
+                      }}
+                    >
+                      {MODE_LABELS[option]}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <button
+                  className={styles.modeTrigger}
+                  onClick={() => setIsMobileModeOpen(true)}
+                  aria-haspopup="menu"
+                  aria-expanded="false"
+                >
+                  <span
+                    className={`fa fa-sliders ${styles.dropdownIcon}`}
+                    aria-hidden="true"
+                  ></span>
+                  <span className={styles.modeTriggerLabel}>Mode: {MODE_LABELS[mode]}</span>
+                  <span
+                    className="fa fa-chevron-down"
+                    aria-hidden="true"
+                  ></span>
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -237,9 +327,7 @@ const Controls: React.FC<ControlsProps> = ({
         </button>
       </form>
 
-      {!isImportMode && (
-        <NameList />
-      )}
+      {!isImportMode && <NameList />}
     </div>
   );
 };
