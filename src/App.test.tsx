@@ -78,6 +78,47 @@ describe('App Component', () => {
     expect(personItem?.className).toContain('disabled');
   });
 
+  it('assigns round-robin order and shows the completion message', () => {
+    vi.spyOn(urlUtils, 'loadNamesFromUrl').mockReturnValue(['SoloWinner']);
+    localStorage.setItem('appMode', 'round-robin');
+
+    const { container } = render(<App />);
+    fireEvent.click(screen.getByTestId('wheel-container'));
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    fireEvent.click(container.querySelector(`div[class*='winnerOverlay']`)!);
+
+    expect(screen.getByText('#1')).toBeInTheDocument();
+    expect(screen.getByText('Round Complete!')).toBeInTheDocument();
+    expect(screen.getByText('Everyone has been called.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Locked')).toBeInTheDocument();
+
+    fireEvent.click(container.querySelector(`div[class*='winnerOverlay']`)!);
+    expect(screen.queryByText('Round Complete!')).not.toBeInTheDocument();
+    expect(screen.getByText('#1')).toBeInTheDocument();
+  });
+
+  it('resets ordered and disabled people when switching back to normal mode', () => {
+    vi.spyOn(urlUtils, 'loadNamesFromUrl').mockReturnValue(['SoloWinner']);
+    localStorage.setItem('appMode', 'round-robin');
+
+    const { container } = render(<App />);
+    fireEvent.click(screen.getByTestId('wheel-container'));
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+    fireEvent.click(container.querySelector(`div[class*='winnerOverlay']`)!);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    fireEvent.click(screen.getByRole('button', { name: /Mode: Round Robin/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Normal' }));
+
+    expect(screen.queryByText('#1')).not.toBeInTheDocument();
+    expect(container.querySelector(`div[class*='person']`)?.className).not.toContain('disabled');
+  });
+
   it('does not spin when there are no enabled people', () => {
     vi.spyOn(urlUtils, 'loadNamesFromUrl').mockReturnValue(['OnlyOne']);
 

@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Controls from './Controls';
 import { PeopleContext } from '../context/PeopleContext';
+import { AppModeContext, type AppMode } from '../context/AppModeContext';
 import { shareUrl } from '../utils/url';
 
 vi.mock('../utils/url', () => ({
@@ -19,12 +20,16 @@ describe('Controls Component', () => {
   const renderControls = (
     people: Person[] = [],
     setPeople = mockSetPeople,
-    onToggleTheme = mockToggleTheme
+    onToggleTheme = mockToggleTheme,
+    mode: AppMode = 'normal',
+    setMode = vi.fn(),
   ) => {
     return render(
-      <PeopleContext.Provider value={{ people, setPeople }}>
-        <Controls onToggleTheme={onToggleTheme} />
-      </PeopleContext.Provider>
+      <AppModeContext.Provider value={{ mode, setMode }}>
+        <PeopleContext.Provider value={{ people, setPeople }}>
+          <Controls onToggleTheme={onToggleTheme} />
+        </PeopleContext.Provider>
+      </AppModeContext.Provider>,
     );
   };
 
@@ -36,6 +41,22 @@ describe('Controls Component', () => {
     expect(screen.getByTitle('Import')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Enter a name')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'App mode' })).toBeInTheDocument();
+  });
+
+  it('changes mode from the desktop mode menu and mobile settings menu', () => {
+    const setMode = vi.fn();
+    renderControls([], mockSetPeople, mockToggleTheme, 'normal', setMode);
+
+    fireEvent.click(screen.getByRole('button', { name: 'App mode' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Round Robin' }));
+    expect(setMode).toHaveBeenCalledWith('round-robin');
+    expect(screen.queryByRole('group', { name: 'App mode' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    fireEvent.click(screen.getByRole('button', { name: /^Mode:/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Round Robin' }));
+    expect(setMode).toHaveBeenCalledTimes(2);
   });
 
   it('calls onToggleTheme when the theme button is clicked', () => {
@@ -59,9 +80,7 @@ describe('Controls Component', () => {
   });
 
   it('adds a single name when form is submitted', () => {
-    const initialPeople: Person[] = [
-      { id: 10, name: 'Existing', enabled: true },
-    ];
+    const initialPeople: Person[] = [{ id: 10, name: 'Existing', enabled: true }];
     renderControls(initialPeople);
 
     const input = screen.getByPlaceholderText('Enter a name') as HTMLInputElement;
